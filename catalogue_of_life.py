@@ -14,11 +14,14 @@ taxons = [
 
 max_depth = 5
 
-if len(sys.argv) <= 1:
-    raise Exception("usage")
+usage_str = "usage: py catalogue_of_life.py [species-count-cutoff]\n" + \
+    "A cutoff of 10k gets about 100 taxons; cutoff of 500 gets about 1k; etc."
+
+if len(sys.argv) != 2:
+    raise Exception(usage_str)
 min_count = int(sys.argv[1])
 if not min_count:
-    raise Exception("usage")
+    raise Exception(usage_str)
 
 db = postgresql.open("pq://localhost/catalogue_of_life")
 
