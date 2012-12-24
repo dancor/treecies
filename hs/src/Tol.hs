@@ -45,9 +45,6 @@ showTolNode (TolNode id name rank) =
     `BS.append`
     (' ' `BSC.cons` BSC.pack (show id))
 
-showFol :: Fol -> [BS.ByteString]
-showFol = drawForestTiny . map (fmap showTolNode)
-
 readTolNode :: BS.ByteString -> TolNode
 readTolNode s =
     TolNode (read $ BSC.unpack rest2) (BS.init rest1Sp) (abbrToRank r)
@@ -55,6 +52,9 @@ readTolNode s =
     Just (r, s1) = BSC.uncons s
     Just (':', rest) = BSC.uncons s1
     (rest1Sp, rest2) = BSC.breakEnd (== ' ') rest
+
+showFol :: Fol -> [BS.ByteString]
+showFol = drawForestTiny . map (fmap showTolNode)
 
 readTol :: [BS.ByteString] -> Tol
 readTol (l:ls) =

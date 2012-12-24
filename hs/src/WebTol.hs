@@ -50,8 +50,9 @@ growWhileCan :: Main -> String -> Fol -> IO ()
 growWhileCan opts folF fol = do
     (growLeft, fol') <- growFol (growStep opts)
         (readOrErr "Unknown taxon level" $ growRank opts) fol
-    writeFolF folF fol'
-    writeFolF (folF ++ ".lol") fol'
+    let folEnc = BSC.unlines $ showFol fol'
+    BS.writeFile folF folEnc
+    BS.writeFile (folF ++ ".lol") folEnc
     putStrLn $ "Saved.  growLeft = " ++ show growLeft
     when (growLeft == 0) $ growWhileCan opts folF fol'
 
