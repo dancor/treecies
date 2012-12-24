@@ -3,12 +3,12 @@ module Tol where
 import Control.Applicative
 import Control.Arrow
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
 import Data.Either.Unwrap
 import Data.List
 import Data.List.Split
 import Data.Ord
 import Data.Tree
-import FUtil
 
 import Rank
 import TolNode
@@ -32,41 +32,46 @@ kingdoms =
 nodeToTree :: a -> Tree a
 nodeToTree a = Node a []
 
-drawTreeTiny :: Tree String -> [String]
+drawTreeTiny :: Tree BS.ByteString -> [BS.ByteString]
 drawTreeTiny (Node s kids) =
-    [s] ++ map (' ':) (drawForestTiny kids)
+    [s] ++ map (BSC.cons ' ') (drawForestTiny kids)
 
-drawForestTiny :: Forest String -> [String]
+drawForestTiny :: Forest BS.ByteString -> [BS.ByteString]
 drawForestTiny = concatMap drawTreeTiny
 
-showFol :: Fol -> [String]
-showFol =
-    drawForestTiny .
-    map (fmap (\tn -> 
-        rankAbbr (tnRank tn) : ':' : tnName tn ++ ' ' : show (tnId tn)))
+showTolNode :: TolNode -> BS.ByteString
+showTolNode (TolNode id name rank) =
+    BSC.cons (rankAbbr rank) (BSC.cons ':' name)
+    `BS.append`
+    (' ' `BSC.cons` BSC.pack (show id))
 
-readTolNode :: String -> TolNode
-readTolNode (r:':':rest) =
-    TolNode (read rest2) (init rest1Sp) (abbrToRank r)
+showFol :: Fol -> [BS.ByteString]
+showFol = drawForestTiny . map (fmap showTolNode)
+
+readTolNode :: BS.ByteString -> TolNode
+readTolNode s =
+    TolNode (read $ BSC.unpack rest2) (BS.init rest1Sp) (abbrToRank r)
   where
-    (rest1Sp, rest2) = reversifyTup (break (== ' ')) rest
+    Just (r, s1) = BSC.uncons s
+    Just (':', rest) = BSC.uncons s1
+    (rest1Sp, rest2) = BSC.breakEnd (== ' ') rest
 
-readTol :: [String] -> Tol
+readTol :: [BS.ByteString] -> Tol
 readTol (l:ls) =
-    Node (readTolNode l) . readFol $ map tail ls
+    Node (readTolNode l) . readFol $ map BS.tail ls
 
-readFol :: [String] -> Fol
+readFol :: [BS.ByteString] -> Fol
 readFol [] = []
 readFol (l:ls) =
     readTol (l:ls1) : readFol ls2
   where
-    (ls1, ls2) = span ((' ' ==) . head) ls
+    (ls1, ls2) = span ((== ' ') . BSC.head) ls
 
 readFolF :: FilePath -> IO Fol
-readFolF folF = readFol . lines <$> readFile folF
+readFolF folF = readFol . BSC.lines <$> BS.readFile folF
 
 writeFolF :: FilePath -> Fol -> IO ()
-writeFolF folF = writeFile folF . unlines . showFol
+writeFolF folF = BS.writeFile folF . BSC.unlines . showFol
 
 treeKidCount :: Tree a -> Tree (a, Int)
 treeKidCount (Node n kids) = Node (n, length kids) (forestKidCount kids)
@@ -96,8 +101,10 @@ tolExtractCounts :: Tol -> Tree (TolNode, Int)
 tolExtractCounts = fmap (\tn -> (tn, fromJust $ tnCount tn))
 -}
 
-folSummary :: Fol -> [String]
+folSummary :: Fol -> [BS.ByteString]
 folSummary fol = concat
+    []
+{-
     [ ["Levels:\t\t" ++ levShow levsTotal]
     , zipWith (\k levs -> "- " ++ k ++ ":\t" ++ levShow levs)
         kingdoms
@@ -130,4 +137,4 @@ folSummary fol = concat
     levShow = intercalate "\t" . map (show . length)
     levsByKingdom = map levels fol
     levsTotal = map concat $ transpose levsByKingdom
-
+-}

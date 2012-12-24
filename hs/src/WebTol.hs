@@ -5,6 +5,8 @@
 import Control.Applicative
 import Control.Arrow
 import Control.Monad
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BSC
 import Data.List
 import Data.Maybe
 import Data.Ord
@@ -106,6 +108,6 @@ main = getArgs >>= executeR Main {} >>= \opts -> do
         writeFolF folF fol
         putStrLn "Done."
     fol <- readFolF folF
-    when (printTree opts) . putStr . unlines $ showFol fol
-    when (treeSummary opts) . putStr . unlines $ folSummary fol
+    when (printTree opts) . BS.putStr . BSC.unlines $ showFol fol
+    when (treeSummary opts) . BS.putStr . BSC.unlines $ folSummary fol
     when (growTree opts) $ growWhileCan opts folF fol

@@ -1,6 +1,7 @@
 module SearchInfo where
 
 import Control.Applicative
+import qualified Data.ByteString.Char8 as BSC
 import Data.List
 import Data.List.Utils
 import Data.Maybe
@@ -37,9 +38,9 @@ pullCdDataOf a = pullCdData . fromJust . X.findChild (X.unqual a)
 
 xmlGetTolNode :: X.Element -> TolNode
 xmlGetTolNode a = TolNode
-    (read $ pullCdDataOf "id" a)
-    (       pullCdDataOf "name" a)
-    (read $ pullCdDataOf "rank" a)
+    (read $     pullCdDataOf "id" a)
+    (BSC.pack $ pullCdDataOf "name" a)
+    (read $     pullCdDataOf "rank" a)
 
 searchToInfo :: Maybe Rank -> String -> IO SearchInfo
 searchToInfo rankMb search = do
