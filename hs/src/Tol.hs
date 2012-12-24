@@ -10,6 +10,7 @@ import Data.Either.Unwrap
 import Data.List
 import Data.List.Split
 import qualified Data.Map as M
+import Data.Maybe
 import Data.Ord
 import Data.Tree
 
@@ -58,8 +59,30 @@ readFol (l:ls) =
   where
     (ls1, ls2) = span ((== ' ') . BSC.head) ls
 
+fromJustOrErr e = fromMaybe (error e)
+
+tolKillGenusDup :: Maybe BS.ByteString -> Tol -> Tol
+tolKillGenusDup s (n@(Node tn kids)) =
+    case tnRank tn of
+        Species ->
+            let sSp =
+                    fromJustOrErr (show n) s `BS.append`
+                    BSC.singleton ' '
+            in
+            if sSp `BS.isPrefixOf` tnName tn
+                then Node
+                         (tn {tnName = BS.drop (BS.length sSp) $ tnName tn})
+                         kids
+                else error $ show tn
+        _ -> Node tn $ folKillGenusDup (Just $ tnName tn) kids
+
+folKillGenusDup :: Maybe BS.ByteString -> Fol -> Fol
+folKillGenusDup s = map (tolKillGenusDup s)
+
 readFolF :: FilePath -> IO Fol
-readFolF folF = readFol . BSC.lines <$> BS.readFile folF
+readFolF folF =
+    folKillGenusDup Nothing .
+    readFol . BSC.lines <$> BS.readFile folF
 
 writeFolF :: FilePath -> Fol -> IO ()
 writeFolF folF = BS.writeFile folF . BSC.unlines . showFol

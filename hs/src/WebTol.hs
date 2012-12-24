@@ -24,7 +24,7 @@ import Tol
 
 growTol :: Int -> Rank -> Tol -> IO (Int, Tol)
 growTol 0 _rank tol = return (0, tol)
-growTol maxGrows rank (n@(Node tn [])) = 
+growTol maxGrows rank (n@(Node tn [])) =
     if tnRank tn >= rank
     then return (maxGrows, n)
     else do
@@ -74,7 +74,7 @@ instance Attributes Main where
             [ Help "Summarize the contents of the tree."
             ]
         , growTree %>
-            [ Help $ "Grow the tree (one level closer, currently)\n" ++ 
+            [ Help $ "Grow the tree (one level closer, currently)\n" ++
                      "to the grow level."
             ]
         , growRank %>
