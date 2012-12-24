@@ -65,6 +65,7 @@ searchInfoToTol (SearchInfo tolNode kids) =
 idToTol :: Int -> IO Tol
 idToTol id = searchInfoToTol <$> idToInfo id
 
+{-
 initialFol :: IO Fol
-initialFol = map searchInfoToTol <$> mapM topNameToInfo kingdoms
-
+initialFol = map searchInfoToTol <$> mapM (topNameToInfo . BSC.unpack) kingdoms
+-}

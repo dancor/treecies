@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Tol where
 
 import Control.Applicative
@@ -7,6 +9,7 @@ import qualified Data.ByteString.Char8 as BSC
 import Data.Either.Unwrap
 import Data.List
 import Data.List.Split
+import qualified Data.Map as M
 import Data.Ord
 import Data.Tree
 
@@ -16,18 +19,6 @@ import TolNode
 type Fol = Forest TolNode
 
 type Tol = Tree TolNode
-
-kingdoms :: [String]
-kingdoms =
-    [ "Animalia"
-    , "Plantae"
-    , "Fungi"
-    , "Protozoa"
-    , "Bacteria"
-    , "Chromista"
-    , "Viruses"
-    , "Archaea"
-    ]
 
 nodeToTree :: a -> Tree a
 nodeToTree a = Node a []
@@ -79,62 +70,53 @@ treeKidCount (Node n kids) = Node (n, length kids) (forestKidCount kids)
 forestKidCount :: Forest a -> Forest (a, Int)
 forestKidCount = map treeKidCount
 
-{-
-folCalcCounts :: Fol -> Fol
+folCalcCounts :: Fol -> Forest (TolNode, M.Map Rank Int)
 folCalcCounts = map tolCalcCounts
 
-tolCalcCounts :: Tol -> Tol
-tolCalcCounts (Node tn []) = Node (tn {tnCount = Just 1}) []
+tolCalcCounts :: Tol -> Tree (TolNode, M.Map Rank Int)
 tolCalcCounts (Node tn kids) =
-    Node 
-        (tn {tnCount = Just $ 
-                sum (map (fromJust . tnCount . rootLabel) kids')
-            })
-        kids'
+    Node (tn, counts) kids'
   where
     kids' = folCalcCounts kids
+    kidsCounts = map (snd . rootLabel) kids'
+    counts =
+        M.unionsWith (+)
+        ((M.singleton (tnRank tn) 1) : kidsCounts)
 
-folExtractCounts :: Fol -> Forest (TolNode, Int)
-folExtractCounts = map tolExtractCounts
+showCounts :: M.Map Rank Int -> BS.ByteString
+showCounts =
+    BS.intercalate (BSC.pack ",\t") .
+    map (\(rank, i) -> BSC.pack $ rankAbbr rank : ':' : show i) .
+    killKingdom .
+    killFirstIfOne .
+    M.toList
+  where
+    killFirstIfOne ((_, 1) : rest) = rest
+    killFirstIfOne a = a
+    killKingdom ((Kingdom, _) : rest) = rest
+    killKingdom a = a
 
-tolExtractCounts :: Tol -> Tree (TolNode, Int)
-tolExtractCounts = fmap (\tn -> (tn, fromJust $ tnCount tn))
--}
+showTolCounts :: Tree (TolNode, M.Map Rank Int) -> BS.ByteString
+showTolCounts (Node (tn, c) _) =
+    BS.concat [tnName tn, ":\t", showCounts c]
+
+showFolCounts :: Forest (TolNode, M.Map Rank Int) -> [BS.ByteString]
+showFolCounts = map (("- " `BS.append`) . showTolCounts)
+
+travelDown
+    :: BS.ByteString
+    -> Forest (TolNode, M.Map Rank Int)
+    -> Forest (TolNode, M.Map Rank Int)
+travelDown s = subForest . head . filter ((== s) . tnName . fst . rootLabel)
 
 folSummary :: Fol -> [BS.ByteString]
 folSummary fol = concat
-    []
-{-
-    [ ["Levels:\t\t" ++ levShow levsTotal]
-    , zipWith (\k levs -> "- " ++ k ++ ":\t" ++ levShow levs)
-        kingdoms
-        levsByKingdom ++
-      ["Largest by immediate children:"]
-    , concatMap (\(k, tol) -> 
-          zipWith (\rank lev ->
-                      "- " ++ k ++ "   \t" ++ rank ++ ":  \t" ++ 
-                      showTnAndSize (maximumBy (comparing snd) lev)
-                  )
-              (init $ tail rankNames)
-              (tail . levels $ treeKidCount tol)
-          ) tolByKingdom
-{-
-    , ["Largest by leaf count (species or lowest taxon in tree):"]
-    , concatMap (\(k, tol) -> 
-          zipWith (\rank lev ->
-                      "- " ++ k ++ "   \t" ++ rank ++ ":  \t" ++ 
-                      showTnAndSize (maximumBy (comparing snd) lev)
-                  )
-              (init $ tail rankNames)
-              (tail . levels . tolExtractCounts $ tolCalcCounts tol)
-          ) tolByKingdom
--}
+    [ [showTolCounts topCounts]
+    , showFolCounts folCounts
+    , [""]
+    , ["Protozoa"]
+    , showFolCounts (travelDown "Protozoa" folCounts)
     ]
   where
-    showTnAndSize (tn, n) = show n ++ " " ++ tnName tn
-    tolByKingdom = zip kingdoms fol
-
-    levShow = intercalate "\t" . map (show . length)
-    levsByKingdom = map levels fol
-    levsTotal = map concat $ transpose levsByKingdom
--}
+    topCounts = tolCalcCounts $ Node (TolNode 0 "All Life" RankAll) fol
+    folCounts = subForest topCounts

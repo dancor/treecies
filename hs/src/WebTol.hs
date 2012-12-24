@@ -104,10 +104,13 @@ main :: IO ()
 main = getArgs >>= executeR Main {} >>= \opts -> do
     let [folF] = optExtra opts
     unlessM (doesFileExist folF) $ do
+        error "XXX: switch to id=0 top node"
+        {-
         putStrLn $ "Grabbing phylum tree to file: " ++ show folF
         fol <- initialFol
         writeFolF folF fol
         putStrLn "Done."
+        -}
     fol <- readFolF folF
     when (printTree opts) . BS.putStr . BSC.unlines $ showFol fol
     when (treeSummary opts) . BS.putStr . BSC.unlines $ folSummary fol

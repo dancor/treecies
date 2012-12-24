@@ -9,7 +9,8 @@ import GHC.Generics
 -- The Catalogue of Life includes "superfamily" for certain groups,
 -- such as large beetle orders.
 data Rank
-    = Kingdom
+    = RankAll
+    | Kingdom
     | Phylum
     | Class
     | Order
@@ -20,6 +21,7 @@ data Rank
     deriving (Enum, Eq, Generic, Ord, Show, Read)
 
 rankAbbr :: Rank -> Char
+rankAbbr RankAll     = '@'
 rankAbbr Kingdom     = 'K'
 rankAbbr Phylum      = 'P'
 rankAbbr Class       = 'C'
@@ -30,6 +32,7 @@ rankAbbr Genus       = 'G'
 rankAbbr Species     = 'S'
 
 abbrToRank :: Char -> Rank
+abbrToRank '@' = RankAll
 abbrToRank 'K' = Kingdom
 abbrToRank 'P' = Phylum
 abbrToRank 'C' = Class
@@ -42,6 +45,3 @@ abbrToRank 'S' = Species
 instance Ser.Serialize Rank where
     get = deriveGet
     put = derivePut
-
-rankNames :: [String]
-rankNames = map show [Kingdom .. Species]
