@@ -1,0 +1,680 @@
+All Life:	P:117	C:311	O:1281	F:8458	G:132004	S:1323005
+- Animalia:	P:36	C:108	O:554	F:5815	G:103758	S:986643
+- Plantae:	P:19	C:42	O:223	F:845	G:14569	S:257356
+- Fungi:	P:9	C:42	O:160	F:654	G:8184	S:45752
+- Protozoa:	P:16	C:48	O:123	F:494	G:1919	S:14434
+- Bacteria:	P:25	C:35	O:91	F:268	G:1637	S:9072
+- Chromista:	P:9	C:26	O:110	F:263	G:1440	S:6987
+- Viruses:	P:1	C:1	O:7	F:96	G:411	S:2480
+- Archaea:	P:2	C:9	O:13	F:23	G:86	S:281
+
+Animalia   	Phyla with most	Classes:  	Arthropoda 15
+           	               	          	Chordata 14
+           	               	          	Platyhelminthes 9
+           	               	          	Mollusca 7
+           	               	          	Echinodermata 6
+
+Animalia   	Phyla with most	Orders:  	Chordata 141
+           	               	         	Arthropoda 126
+           	               	         	Mollusca 49
+           	               	         	Platyhelminthes 39
+           	               	         	Echinodermata 38
+
+Animalia   	Phyla with most	Families:  	Arthropoda 2587
+           	               	           	Chordata 1040
+           	               	           	Mollusca 489
+           	               	           	Platyhelminthes 306
+           	               	           	Cnidaria 288
+
+Animalia   	Phyla with most	Genera:  	Arthropoda 81236
+           	               	         	Chordata 10068
+           	               	         	Mollusca 2789
+           	               	         	Annelida 1827
+           	               	         	Cnidaria 1512
+
+Animalia   	Phyla with most	Species:  	Arthropoda 849277
+           	               	          	Chordata 64554
+           	               	          	Mollusca 14228
+           	               	          	Annelida 12894
+           	               	          	Cnidaria 9721
+
+
+Animalia   	Classes with most	Orders:  	Actinopterygii 47
+           	                 	         	Aves 33
+           	                 	         	Insecta 30
+           	                 	         	Mammalia 29
+           	                 	         	Gastropoda 23
+
+Animalia   	Classes with most	Families:  	Insecta 1013
+           	                 	           	Malacostraca 547
+           	                 	           	Actinopterygii 486
+           	                 	           	Arachnida 475
+           	                 	           	Gastropoda 308
+
+Animalia   	Classes with most	Genera:  	Insecta 65612
+           	                 	         	Arachnida 6263
+           	                 	         	Actinopterygii 4780
+           	                 	         	Malacostraca 4668
+           	                 	         	Diplopoda 2306
+
+Animalia   	Classes with most	Species:  	Insecta 730538
+           	                 	          	Arachnida 63483
+           	                 	          	Actinopterygii 30948
+           	                 	          	Malacostraca 27836
+           	                 	          	Diplopoda 12126
+
+
+Animalia   	Orders with most	Families:  	Sarcoptiformes 172
+           	                	           	Decapoda 169
+           	                	           	Perciformes 165
+           	                	           	Coleoptera 160
+           	                	           	Diptera 159
+
+Animalia   	Orders with most	Genera:  	Coleoptera 16487
+           	                	         	Lepidoptera 16477
+           	                	         	Diptera 9102
+           	                	         	Hemiptera 7920
+           	                	         	Hymenoptera 6261
+
+Animalia   	Orders with most	Species:  	Coleoptera 196741
+           	                	          	Diptera 154188
+           	                	          	Lepidoptera 149090
+           	                	          	Hymenoptera 104266
+           	                	          	Hemiptera 55664
+
+
+Animalia   	Families with most	Genera:  	Curculionidae 5102
+           	                  	         	Cerambycidae 4937
+           	                  	         	Noctuidae 3011
+           	                  	         	Cicadellidae 2357
+           	                  	         	Geometridae 1876
+
+Animalia   	Families with most	Species:  	Curculionidae 82736
+           	                  	          	Cerambycidae 33140
+           	                  	          	Ichneumonidae 23772
+           	                  	          	Noctuidae 23131
+           	                  	          	Geometridae 21260
+
+
+Animalia   	Genera with most	Species:  	Curculio 3730
+           	                	          	Onthophagus 2312
+           	                	          	Tipula 2281
+           	                	          	Otiorrhynchus 2234
+           	                	          	Lasioglossum 1740
+
+
+Plantae   	Phyla with most	Classes:  	Chlorophyta 11
+          	               	          	Rhodophyta 4
+          	               	          	Bryophyta 3
+          	               	          	Marchantiophyta 3
+          	               	          	Pteridophyta 3
+
+Plantae   	Phyla with most	Orders:  	Magnoliophyta 61
+          	               	         	Chlorophyta 38
+          	               	         	Rhodophyta 29
+          	               	         	Bacillariophyta 23
+          	               	         	Bryophyta 23
+
+Plantae   	Phyla with most	Families:  	Magnoliophyta 326
+          	               	           	Chlorophyta 119
+          	               	           	Bryophyta 97
+          	               	           	Rhodophyta 93
+          	               	           	Marchantiophyta 83
+
+Plantae   	Phyla with most	Genera:  	Magnoliophyta 10375
+          	               	         	Bryophyta 1056
+          	               	         	Rhodophyta 894
+          	               	         	Chlorophyta 846
+          	               	         	Bacillariophyta 403
+
+Plantae   	Phyla with most	Species:  	Magnoliophyta 221220
+          	               	          	Bryophyta 13365
+          	               	          	Rhodophyta 6511
+          	               	          	Bacillariophyta 6389
+          	               	          	Chlorophyta 5958
+
+
+Plantae   	Classes with most	Orders:  	Magnoliopsida 49
+          	                 	         	Florideophyceae 23
+          	                 	         	Bacillariophyceae 22
+          	                 	         	Bryopsida 20
+          	                 	         	Chlorophyceae 12
+
+Plantae   	Classes with most	Families:  	Magnoliopsida 247
+          	                 	           	Bryopsida 94
+          	                 	           	Florideophyceae 85
+          	                 	           	Liliopsida 79
+          	                 	           	Jungermanniopsida 61
+
+Plantae   	Classes with most	Genera:  	Magnoliopsida 7539
+          	                 	         	Liliopsida 2836
+          	                 	         	Bryopsida 1053
+          	                 	         	Florideophyceae 857
+          	                 	         	Chlorophyceae 484
+
+Plantae   	Classes with most	Species:  	Magnoliopsida 148306
+          	                 	          	Liliopsida 72914
+          	                 	          	Bryopsida 12962
+          	                 	          	Florideophyceae 6244
+          	                 	          	Bacillariophyceae 6183
+
+
+Plantae   	Orders with most	Families:  	Gigartinales 41
+          	                	           	Jungermanniales 36
+          	                	           	Malpighiales 26
+          	                	           	Caryophyllales 24
+          	                	           	Ericales 19
+
+Plantae   	Orders with most	Genera:  	Asterales 1994
+          	                	         	Asparagales 1186
+          	                	         	Poales 995
+          	                	         	Apiales 776
+          	                	         	Fabales 742
+
+Plantae   	Orders with most	Species:  	Asparagales 35948
+          	                	          	Asterales 35677
+          	                	          	Poales 22990
+          	                	          	Rosales 21825
+          	                	          	Fabales 20074
+
+
+Plantae   	Families with most	Genera:  	Asteraceae 1903
+          	                  	         	Orchidaceae 847
+          	                  	         	Poaceae 740
+          	                  	         	Apiaceae 733
+          	                  	         	Fabaceae 732
+
+Plantae   	Families with most	Species:  	Asteraceae 33295
+          	                  	          	Orchidaceae 27234
+          	                  	          	Rosaceae 21483
+          	                  	          	Fabaceae 19999
+          	                  	          	Rubiaceae 13514
+
+
+Plantae   	Genera with most	Species:  	Rubus 6556
+          	                	          	Rosa 3451
+          	                	          	Astragalus 2326
+          	                	          	Taraxacum 2318
+          	                	          	Hieracium 2286
+
+
+Fungi   	Phyla with most	Classes:  	Ascomycota 16
+        	               	          	Basidiomycota 16
+        	               	          	Chytridiomycota 3
+        	               	          	Zygomycota 2
+        	               	          	Blastocladiomycota 1
+
+Fungi   	Phyla with most	Orders:  	Ascomycota 73
+        	               	         	Basidiomycota 58
+        	               	         	Zygomycota 12
+        	               	         	Chytridiomycota 8
+        	               	         	Glomeromycota 4
+
+Fungi   	Phyla with most	Families:  	Ascomycota 355
+        	               	           	Basidiomycota 210
+        	               	           	Zygomycota 35
+        	               	           	Chytridiomycota 28
+        	               	           	Glomeromycota 9
+
+Fungi   	Phyla with most	Genera:  	Ascomycota 6159
+        	               	         	Basidiomycota 1694
+        	               	         	Zygomycota 169
+        	               	         	Chytridiomycota 111
+        	               	         	Blastocladiomycota 13
+
+Fungi   	Phyla with most	Species:  	Ascomycota 30787
+        	               	          	Basidiomycota 13266
+        	               	          	Zygomycota 1032
+        	               	          	Chytridiomycota 375
+        	               	          	Glomeromycota 166
+
+
+Fungi   	Classes with most	Orders:  	Agaricomycetes 18
+        	                 	         	Sordariomycetes 16
+        	                 	         	Dothideomycetes 12
+        	                 	         	Lecanoromycetes 11
+        	                 	         	Eurotiomycetes 10
+
+Fungi   	Classes with most	Families:  	Agaricomycetes 111
+        	                 	           	Dothideomycetes 91
+        	                 	           	Sordariomycetes 77
+        	                 	           	Lecanoromycetes 70
+        	                 	           	Not assigned 33
+
+Fungi   	Classes with most	Genera:  	Not assigned 1896
+        	                 	         	Agaricomycetes 1245
+        	                 	         	Dothideomycetes 1218
+        	                 	         	Sordariomycetes 1185
+        	                 	         	Leotiomycetes 652
+
+Fungi   	Classes with most	Species:  	Agaricomycetes 10241
+        	                 	          	Sordariomycetes 6881
+        	                 	          	Dothideomycetes 6847
+        	                 	          	Lecanoromycetes 6712
+        	                 	          	Not assigned 3000
+
+
+Fungi   	Orders with most	Families:  	Not assigned 32
+        	                	           	Agaricales 29
+        	                	           	Pleosporales 28
+        	                	           	Boletales 20
+        	                	           	Lecanorales 19
+
+Fungi   	Orders with most	Genera:  	Not assigned 1890
+        	                	         	Helotiales 511
+        	                	         	Agaricales 461
+        	                	         	Pleosporales 353
+        	                	         	Not assigned 352
+
+Fungi   	Orders with most	Species:  	Agaricales 4429
+        	                	          	Lecanorales 3511
+        	                	          	Not assigned 2990
+        	                	          	Pleosporales 2655
+        	                	          	Capnodiales 2165
+
+
+Fungi   	Families with most	Genera:  	Not assigned 1881
+        	                  	         	Not assigned 190
+        	                  	         	Not assigned 182
+        	                  	         	Laboulbeniaceae 128
+        	                  	         	Helotiaceae 116
+
+Fungi   	Families with most	Species:  	Not assigned 2937
+        	                  	          	Parmeliaceae 2057
+        	                  	          	Mycosphaerellaceae 1403
+        	                  	          	Phyllachoraceae 1219
+        	                  	          	Xylariaceae 738
+
+
+Fungi   	Genera with most	Species:  	Phyllachora 898
+        	                	          	Xanthoparmelia 779
+        	                	          	Cortinarius 384
+        	                	          	Puccinia 383
+        	                	          	Mycosphaerella 322
+
+
+Protozoa   	Phyla with most	Classes:  	Ciliophora 15
+           	               	          	Not assigned 8
+           	               	          	Mycetozoa 4
+           	               	          	Dinophyta 3
+           	               	          	Apicomplexa 2
+
+Protozoa   	Phyla with most	Orders:  	Ciliophora 57
+           	               	         	Dinophyta 17
+           	               	         	Not assigned 12
+           	               	         	Mycetozoa 9
+           	               	         	Cercozoa 4
+
+Protozoa   	Phyla with most	Families:  	Ciliophora 267
+           	               	           	Not assigned 90
+           	               	           	Dinophyta 63
+           	               	           	Mycetozoa 23
+           	               	           	Euglenozoa 11
+
+Protozoa   	Phyla with most	Genera:  	Ciliophora 928
+           	               	         	Not assigned 364
+           	               	         	Dinophyta 352
+           	               	         	Mycetozoa 83
+           	               	         	Acritarcha 56
+
+Protozoa   	Phyla with most	Species:  	Ciliophora 8699
+           	               	          	Dinophyta 1719
+           	               	          	Not assigned 1495
+           	               	          	Mycetozoa 1092
+           	               	          	Euglenozoa 1031
+
+
+Protozoa   	Classes with most	Orders:  	Dinophyceae 15
+           	                 	         	Colpodea 7
+           	                 	         	Oligohymenophorea 7
+           	                 	         	Gymnostomatea 6
+           	                 	         	Oligotrichea 5
+
+Protozoa   	Classes with most	Families:  	Oligohymenophorea 61
+           	                 	           	Dinophyceae 59
+           	                 	           	Granuloreticulosea 59
+           	                 	           	Kinetofragminophora 34
+           	                 	           	Hypotrichea 28
+
+Protozoa   	Classes with most	Genera:  	Dinophyceae 342
+           	                 	         	Granuloreticulosea 307
+           	                 	         	Oligohymenophorea 193
+           	                 	         	Hypotrichea 172
+           	                 	         	Gymnostomatea 102
+
+Protozoa   	Classes with most	Species:  	Oligohymenophorea 2669
+           	                 	          	Dinophyceae 1701
+           	                 	          	Hypotrichea 1386
+           	                 	          	Granuloreticulosea 1349
+           	                 	          	Euglenida 1027
+
+
+Protozoa   	Orders with most	Families:  	Foraminiferida 59
+           	                	           	Suctorida 27
+           	                	           	Heterotrichida 17
+           	                	           	Peritrichida 17
+           	                	           	Peridiniales 17
+
+Protozoa   	Orders with most	Genera:  	Foraminiferida 307
+           	                	         	Not assigned 172
+           	                	         	Heterotrichida 76
+           	                	         	Peritrichida 75
+           	                	         	Peridiniales 66
+
+Protozoa   	Orders with most	Species:  	Peritrichida 1736
+           	                	          	Foraminiferida 1349
+           	                	          	Euglenales 865
+           	                	          	Heterotrichida 661
+           	                	          	Peridiniales 559
+
+
+Protozoa   	Families with most	Genera:  	Not assigned 162
+           	                  	         	Oxytrichidae 57
+           	                  	         	Not assigned 56
+           	                  	         	Miliolidae 26
+           	                  	         	Discorbidae 21
+
+Protozoa   	Families with most	Species:  	Euglenaceae 804
+           	                  	          	Oxytrichidae 457
+           	                  	          	Not assigned 438
+           	                  	          	Vorticellidae 424
+           	                  	          	Gymnodiniaceae 333
+
+
+Protozoa   	Genera with most	Species:  	Trachelomonas 303
+           	                	          	Vorticella 287
+           	                	          	Cothurnia 167
+           	                	          	Epistylis 162
+           	                	          	Phacus 156
+
+
+Bacteria   	Phyla with most	Classes:  	Proteobacteria 5
+           	               	          	Bacteroidetes 3
+           	               	          	Chloroflexi 3
+           	               	          	Firmicutes 3
+           	               	          	Acidobacteria 1
+
+Bacteria   	Phyla with most	Orders:  	Proteobacteria 40
+           	               	         	Firmicutes 10
+           	               	         	Cyanobacteria 7
+           	               	         	Actinobacteria 6
+           	               	         	Chloroflexi 4
+
+Bacteria   	Phyla with most	Families:  	Proteobacteria 97
+           	               	           	Actinobacteria 47
+           	               	           	Cyanobacteria 39
+           	               	           	Firmicutes 35
+           	               	           	Bacteroidetes 13
+
+Bacteria   	Phyla with most	Genera:  	Proteobacteria 648
+           	               	         	Cyanobacteria 290
+           	               	         	Firmicutes 269
+           	               	         	Actinobacteria 193
+           	               	         	Bacteroidetes 133
+
+Bacteria   	Phyla with most	Species:  	Cyanobacteria 2604
+           	               	          	Proteobacteria 2405
+           	               	          	Actinobacteria 1764
+           	               	          	Firmicutes 1564
+           	               	          	Bacteroidetes 415
+
+
+Bacteria   	Classes with most	Orders:  	Gammaproteobacteria 15
+           	                 	         	Alphaproteobacteria 8
+           	                 	         	Deltaproteobacteria 8
+           	                 	         	Not assigned 7
+           	                 	         	Betaproteobacteria 7
+
+Bacteria   	Classes with most	Families:  	Actinobacteria 47
+           	                 	           	Not assigned 39
+           	                 	           	Gammaproteobacteria 37
+           	                 	           	Alphaproteobacteria 22
+           	                 	           	Deltaproteobacteria 21
+
+Bacteria   	Classes with most	Genera:  	Not assigned 290
+           	                 	         	Gammaproteobacteria 232
+           	                 	         	Alphaproteobacteria 203
+           	                 	         	Actinobacteria 193
+           	                 	         	Clostridia 154
+
+Bacteria   	Classes with most	Species:  	Not assigned 2604
+           	                 	          	Actinobacteria 1764
+           	                 	          	Gammaproteobacteria 1098
+           	                 	          	Bacilli 787
+           	                 	          	Alphaproteobacteria 655
+
+
+Bacteria   	Orders with most	Families:  	Actinomycetales 40
+           	                	           	Chroococcales 11
+           	                	           	Rhizobiales 11
+           	                	           	Bacillales 10
+           	                	           	Alteromonadales 9
+
+Bacteria   	Orders with most	Genera:  	Actinomycetales 170
+           	                	         	Clostridiales 128
+           	                	         	Chroococcales 121
+           	                	         	Burkholderiales 75
+           	                	         	Rhizobiales 71
+
+Bacteria   	Orders with most	Species:  	Actinomycetales 1696
+           	                	          	Chroococcales 1113
+           	                	          	Oscillatoriales 651
+           	                	          	Nostocales 633
+           	                	          	Clostridiales 490
+
+
+Bacteria   	Families with most	Genera:  	Flavobacteriaceae 59
+           	                  	         	Rhodobacteraceae 58
+           	                  	         	Enterobacteriaceae 47
+           	                  	         	Clostridiaceae 34
+           	                  	         	Synechococcaceae 31
+
+Bacteria   	Families with most	Species:  	Streptomycetaceae 545
+           	                  	          	Nostocaceae 284
+           	                  	          	Oscillatoriaceae 250
+           	                  	          	Synechococcaceae 243
+           	                  	          	Bacillaceae 228
+
+
+Bacteria   	Genera with most	Species:  	Streptomyces 518
+           	                	          	Clostridium 166
+           	                	          	Bacillus 136
+           	                	          	Mycobacterium 122
+           	                	          	Pseudomonas 118
+
+
+Chromista   	Phyla with most	Classes:  	Ochrophyta 15
+            	               	          	Haptophyta 2
+            	               	          	Not assigned 2
+            	               	          	Oomycota 2
+            	               	          	Cryptophyta 1
+
+Chromista   	Phyla with most	Orders:  	Ochrophyta 76
+            	               	         	Oomycota 15
+            	               	         	Haptophyta 6
+            	               	         	Cryptophyta 4
+            	               	         	Labyrinthista 3
+
+Chromista   	Phyla with most	Families:  	Ochrophyta 172
+            	               	           	Oomycota 31
+            	               	           	Haptophyta 19
+            	               	           	Radiozoa 16
+            	               	           	Cryptophyta 11
+
+Chromista   	Phyla with most	Genera:  	Ochrophyta 865
+            	               	         	Radiozoa 213
+            	               	         	Haptophyta 178
+            	               	         	Oomycota 105
+            	               	         	Cryptophyta 40
+
+Chromista   	Phyla with most	Species:  	Ochrophyta 5030
+            	               	          	Oomycota 750
+            	               	          	Haptophyta 548
+            	               	          	Radiozoa 416
+            	               	          	Cryptophyta 127
+
+
+Chromista   	Classes with most	Orders:  	Coscinodiscophyceae 21
+            	                 	         	Phaeophyceae 14
+            	                 	         	Oomycetes 11
+            	                 	         	Chrysophyceae 10
+            	                 	         	Synurophyceae 9
+
+Chromista   	Classes with most	Families:  	Phaeophyceae 43
+            	                 	           	Coscinodiscophyceae 39
+            	                 	           	Xanthophyceae 28
+            	                 	           	Oomycetes 25
+            	                 	           	Synurophyceae 20
+
+Chromista   	Classes with most	Genera:  	Phaeophyceae 320
+            	                 	         	Polycystina 213
+            	                 	         	Prymnesiophyceae 174
+            	                 	         	Chrysophyceae 165
+            	                 	         	Coscinodiscophyceae 161
+
+Chromista   	Classes with most	Species:  	Phaeophyceae 2002
+            	                 	          	Coscinodiscophyceae 1696
+            	                 	          	Oomycetes 706
+            	                 	          	Chrysophyceae 616
+            	                 	          	Prymnesiophyceae 535
+
+
+Chromista   	Orders with most	Families:  	Mischococcales 12
+            	                	           	Ectocarpales 11
+            	                	           	Nassellaria 9
+            	                	           	Fucales 8
+            	                	           	Laminariales 8
+
+Chromista   	Orders with most	Genera:  	Ectocarpales 147
+            	                	         	Not assigned 146
+            	                	         	Nassellaria 125
+            	                	         	Spumellaria 88
+            	                	         	Mischococcales 63
+
+Chromista   	Orders with most	Species:  	Ectocarpales 730
+            	                	          	Fucales 577
+            	                	          	Fragilariales 417
+            	                	          	Not assigned 399
+            	                	          	Thalassiosirales 378
+
+
+Chromista   	Families with most	Genera:  	Not assigned 145
+            	                  	         	Chordariaceae 119
+            	                  	         	Actinommidae 53
+            	                  	         	Fragilariaceae 37
+            	                  	         	Theoperidae 35
+
+Chromista   	Families with most	Species:  	Chordariaceae 482
+            	                  	          	Fragilariaceae 417
+            	                  	          	Not assigned 396
+            	                  	          	Sargassaceae 376
+            	                  	          	Peronosporaceae 268
+
+
+Chromista   	Genera with most	Species:  	Sargassum 342
+            	                	          	Fragilaria 152
+            	                	          	Thalassiosira 130
+            	                	          	Ectocarpus 123
+            	                	          	Synedra 113
+
+
+Viruses   	Families with most	Genera:  	Papillomaviridae 30
+          	                  	         	Myoviridae 18
+          	                  	         	Not assigned 15
+          	                  	         	Reoviridae 15
+          	                  	         	Herpesviridae 14
+
+Viruses   	Families with most	Species:  	Geminiviridae 214
+          	                  	          	Potyviridae 175
+          	                  	          	Bunyaviridae 95
+          	                  	          	Herpesviridae 84
+          	                  	          	Reoviridae 84
+
+
+Viruses   	Genera with most	Species:  	Begomovirus: 192
+          	                	          	Potyvirus: 146
+          	                	          	Flavivirus: 53
+          	                	          	Orthobunyavirus: 48
+          	                	          	Carlavirus: 43
+
+
+Archaea   	Phyla with most	Classes:  	Euryarchaeota 8
+          	               	          	Crenarchaeota 1
+
+Archaea   	Phyla with most	Orders:  	Euryarchaeota 9
+          	               	         	Crenarchaeota 4
+
+Archaea   	Phyla with most	Families:  	Euryarchaeota 17
+          	               	           	Crenarchaeota 6
+
+Archaea   	Phyla with most	Genera:  	Euryarchaeota 60
+          	               	         	Crenarchaeota 26
+
+Archaea   	Phyla with most	Species:  	Euryarchaeota 230
+          	               	          	Crenarchaeota 51
+
+
+Archaea   	Classes with most	Orders:  	Thermoprotei 4
+          	                 	         	Methanomicrobia 2
+          	                 	         	Archaeoglobi 1
+          	                 	         	Halobacteria 1
+          	                 	         	Methanobacteria 1
+
+Archaea   	Classes with most	Families:  	Thermoprotei 6
+          	                 	           	Methanomicrobia 6
+          	                 	           	Thermoplasmata 3
+          	                 	           	Methanobacteria 2
+          	                 	           	Methanococci 2
+
+Archaea   	Classes with most	Genera:  	Thermoprotei 26
+          	                 	         	Halobacteria 22
+          	                 	         	Methanomicrobia 19
+          	                 	         	Methanobacteria 5
+          	                 	         	Methanococci 4
+
+Archaea   	Classes with most	Species:  	Halobacteria 72
+          	                 	          	Methanomicrobia 65
+          	                 	          	Thermoprotei 51
+          	                 	          	Methanobacteria 37
+          	                 	          	Thermococci 31
+
+
+Archaea   	Orders with most	Families:  	Methanomicrobiales 4
+          	                	           	Thermoplasmatales 3
+          	                	           	Desulfurococcales 2
+          	                	           	Thermoproteales 2
+          	                	           	Methanobacteriales 2
+
+Archaea   	Orders with most	Genera:  	Halobacteriales 22
+          	                	         	Desulfurococcales 13
+          	                	         	Methanosarcinales 10
+          	                	         	Methanomicrobiales 9
+          	                	         	Sulfolobales 6
+
+Archaea   	Orders with most	Species:  	Halobacteriales 72
+          	                	          	Methanobacteriales 37
+          	                	          	Methanosarcinales 33
+          	                	          	Methanomicrobiales 32
+          	                	          	Thermococcales 31
+
+
+Archaea   	Families with most	Genera:  	Halobacteriaceae 22
+          	                  	         	Desulfurococcaceae 10
+          	                  	         	Methanosarcinaceae 8
+          	                  	         	Sulfolobaceae 6
+          	                  	         	Methanomicrobiaceae 6
+
+Archaea   	Families with most	Species:  	Halobacteriaceae 72
+          	                  	          	Methanobacteriaceae 35
+          	                  	          	Thermococcaceae 31
+          	                  	          	Methanosarcinaceae 27
+          	                  	          	Methanomicrobiaceae 22
+
+
+Archaea   	Genera with most	Species:  	Thermococcus 25
+          	                	          	Halorubrum 15
+          	                	          	Methanobacterium 15
+          	                	          	Methanobrevibacter 12
+          	                	          	Methanosarcina 11
+
+
