@@ -8,6 +8,7 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import Data.Char
 import Data.Either.Unwrap
+import Data.Function
 import Data.List
 import Data.List.Split
 import qualified Data.Map as M
@@ -60,9 +61,26 @@ readFol (l:ls) =
   where
     (ls1, ls2) = span ((== ' ') . BSC.head) ls
 
+folFindDupes :: Fol -> (Fol, [[TolNode]])
+folFindDupes fol =
+    second ((dupes ++) . concat) . unzip .
+    map tolFindDupes $ nubBy ((==) `on` (tnName . rootLabel)) fol
+  where
+    dupes =
+        filter ((> 1) . length) .
+        groupBy ((==) `on` tnName) $
+        sortBy (comparing tnName) $
+        map rootLabel fol
+
+tolFindDupes :: Tol -> (Tol, [[TolNode]])
+tolFindDupes (Node tn kids) = first (Node tn) $ folFindDupes kids
+
 readFolF :: FilePath -> IO Fol
-readFolF folF =
-    readFol . BSC.lines <$> BS.readFile folF
+readFolF folF = do
+    fol <- readFol . BSC.lines <$> BS.readFile folF
+    let (fol', dupes) = folFindDupes fol
+    mapM_ print dupes
+    return fol'
 
 writeFolF :: FilePath -> Fol -> IO ()
 writeFolF folF = BS.writeFile folF . BSC.unlines . showFol
