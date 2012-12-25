@@ -78,8 +78,8 @@ tolFindDupes (Node tn kids) = first (Node tn) $ folFindDupes kids
 readFolF :: FilePath -> IO Fol
 readFolF folF = do
     fol <- readFol . BSC.lines <$> BS.readFile folF
-    let (fol', dupes) = folFindDupes fol
-    mapM_ print dupes
+    --let (fol', dupes) = folFindDupes fol
+    --mapM_ print dupes
     return fol'
 
 writeFolF :: FilePath -> Fol -> IO ()
