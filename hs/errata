@@ -1,0 +1,10 @@
+# I'm not certain, but this seemed a very likely typo.  I fixed it.
+Genus "X anthrichaerophyllum" -> "Xanthrichaerophyllum"
+Species "X anthrichaerophyllum loreti" -> "Xanthrichaerophyllum loreti"
+
+# There is a genus called X in Family Curculionidae?
+# Possibly a hybridization "x" mistake?  Anyway I didn't have data to
+# fix and left it.
+
+# There seem to be a number of species dupes, and maybe some dupes
+# at other levels as well.  I'm going to look into this..
