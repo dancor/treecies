@@ -1,0 +1,7 @@
+- download latest catalogue of life
+  http://www.catalogueoflife.org/services
+- download latest postgres scripts for it from google code
+  (if included ones in COL don't work, didn't for me end of 2011)
+  [link here..]
+- import into postgres and create taxon cache tables with the scripts
+- run this python script to pull the tree to a given granularity

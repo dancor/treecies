@@ -1,7 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Rank where
 
+import qualified Data.ByteString.Char8 as BSC
 import qualified Data.Serialize as Ser
 import Data.Serialize.Derive
 import GHC.Generics
@@ -19,6 +21,16 @@ data Rank
     | Genus
     | Species
     deriving (Enum, Eq, Generic, Ord, Show, Read)
+
+rankPlural :: Rank -> BSC.ByteString
+rankPlural Kingdom     = "Kingdoms"
+rankPlural Phylum      = "Phyla"
+rankPlural Class       = "Classes"
+rankPlural Order       = "Orders"
+rankPlural Superfamily = "Superfamilies"
+rankPlural Family      = "Families"
+rankPlural Genus       = "Genera"
+rankPlural Species     = "Species"
 
 rankAbbr :: Rank -> Char
 rankAbbr RankAll     = '@'
@@ -45,3 +57,14 @@ abbrToRank 'S' = Species
 instance Ser.Serialize Rank where
     get = deriveGet
     put = derivePut
+
+mainRanks :: [Rank]
+mainRanks =
+    [ Kingdom
+    , Phylum
+    , Class
+    , Order
+    , Family
+    , Genus
+    , Species
+    ]

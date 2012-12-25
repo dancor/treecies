@@ -6,6 +6,7 @@ import Control.Applicative
 import Control.Arrow
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
+import Data.Char
 import Data.Either.Unwrap
 import Data.List
 import Data.List.Split
@@ -59,29 +60,8 @@ readFol (l:ls) =
   where
     (ls1, ls2) = span ((== ' ') . BSC.head) ls
 
-fromJustOrErr e = fromMaybe (error e)
-
-tolKillGenusDup :: Maybe BS.ByteString -> Tol -> Tol
-tolKillGenusDup s (n@(Node tn kids)) =
-    case tnRank tn of
-        Species ->
-            let sSp =
-                    fromJustOrErr (show n) s `BS.append`
-                    BSC.singleton ' '
-            in
-            if sSp `BS.isPrefixOf` tnName tn
-                then Node
-                         (tn {tnName = BS.drop (BS.length sSp) $ tnName tn})
-                         kids
-                else error $ show tn
-        _ -> Node tn $ folKillGenusDup (Just $ tnName tn) kids
-
-folKillGenusDup :: Maybe BS.ByteString -> Fol -> Fol
-folKillGenusDup s = map (tolKillGenusDup s)
-
 readFolF :: FilePath -> IO Fol
 readFolF folF =
-    folKillGenusDup Nothing .
     readFol . BSC.lines <$> BS.readFile folF
 
 writeFolF :: FilePath -> Fol -> IO ()
@@ -108,16 +88,15 @@ tolCalcCounts (Node tn kids) =
 
 showCounts :: M.Map Rank Int -> BS.ByteString
 showCounts =
-    BS.intercalate (BSC.pack ",\t") .
+    BS.intercalate (BSC.pack "\t") .
     map (\(rank, i) -> BSC.pack $ rankAbbr rank : ':' : show i) .
-    killKingdom .
+    killSomeRanks .
     killFirstIfOne .
     M.toList
   where
     killFirstIfOne ((_, 1) : rest) = rest
     killFirstIfOne a = a
-    killKingdom ((Kingdom, _) : rest) = rest
-    killKingdom a = a
+    killSomeRanks = filter ((`notElem` [Kingdom, Superfamily]) . fst)
 
 showTolCounts :: Tree (TolNode, M.Map Rank Int) -> BS.ByteString
 showTolCounts (Node (tn, c) _) =
@@ -132,13 +111,48 @@ travelDown
     -> Forest (TolNode, M.Map Rank Int)
 travelDown s = subForest . head . filter ((== s) . tnName . fst . rootLabel)
 
+rankWithMost
+     :: Rank
+     -> Rank
+     -> [Tree (TolNode, M.Map Rank Int)]
+     -> TolNode
+     -> BSC.ByteString
+rankWithMost rank innerRank kids tn =
+    --BS.intercalate (BSC.pack "\n") $
+    BSC.unlines $
+        zipWith BS.append
+            (label : repeat labelSp)
+            results
+  where
+    label = BS.concat
+        [ tnName tn, "   \t", rankPlural rank, " with most\t"
+        , rankPlural innerRank, ":  \t"
+        ]
+    labelSp = BSC.map (\ c -> if isSpace c then c else ' ') label
+    results = take 5 .
+          map (\ (tn, c) ->
+              BS.concat [tnName tn, BSC.pack (' ' : show c)]) .
+          sortBy (flip $ comparing snd) .
+          map (second $ M.findWithDefault 0 innerRank) .
+          -- filter ((/= "Not assigned") . tnName . fst) $
+          filter ((== rank) . tnRank . fst) $
+          concatMap flatten kids
+
 folSummary :: Fol -> [BS.ByteString]
 folSummary fol = concat
     [ [showTolCounts topCounts]
     , showFolCounts folCounts
     , [""]
-    , ["Protozoa"]
-    , showFolCounts (travelDown "Protozoa" folCounts)
+    , filter (not . BS.null) [ BSC.unlines $ catMaybes
+        [ if tnName tn /= "Viruses" || rank >= Family
+          then Just $ rankWithMost rank innerRank kids tn
+          else Nothing
+        | innerRank <- mainRanks
+        , innerRank > rank
+        ]
+      | Node (tn, _) kids <- folCounts
+      , rank <- init $ tail mainRanks
+      ]
     ]
   where
     topCounts = tolCalcCounts $ Node (TolNode 0 "All Life" RankAll) fol

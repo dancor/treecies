@@ -29,7 +29,7 @@ growTol maxGrows rank (n@(Node tn [])) =
     then return (maxGrows, n)
     else do
         print tn
-        (,) (maxGrows - 1) <$> idToTol (tnId tn)
+        (,) (maxGrows - 1) <$> tnGrabKids tn
 growTol maxGrows rank (n@(Node tn fol)) =
     if tnRank tn >= rank
     then return (maxGrows, n)

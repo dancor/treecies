@@ -1,6 +1,7 @@
 module SearchInfo where
 
 import Control.Applicative
+import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import Data.List
 import Data.List.Utils
@@ -62,8 +63,20 @@ searchInfoToTol :: SearchInfo -> Tol
 searchInfoToTol (SearchInfo tolNode kids) =
     Node tolNode $ map nodeToTree kids
 
-idToTol :: Int -> IO Tol
-idToTol id = searchInfoToTol <$> idToInfo id
+tnGrabKids :: TolNode -> IO Tol
+tnGrabKids tn =
+    speciesTrims . searchInfoToTol <$> idToInfo (tnId tn)
+  where
+    speciesTrims (Node tn2 kids) = Node tn2 $ map speciesTrim kids
+    speciesTrim (n@(Node tn3 [])) =
+      if tnRank tn3 == Species
+          then let parentNameSp = tnName tn `BS.append` BSC.singleton ' '
+                   newName = BS.drop (BS.length parentNameSp) $ tnName tn3
+               in  if parentNameSp `BS.isPrefixOf` tnName tn3
+                   then Node (tn3 {tnName = newName}) []
+                   else error "Species name didn't have parent as prefix."
+          else n
+    speciesTrim (Node _ _) = error "Grabbed just kids but now a grandparent."
 
 {-
 initialFol :: IO Fol
