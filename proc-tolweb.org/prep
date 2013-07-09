@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# This will take a while (~1M lines):
+time wget 'http://tolweb.org/onlinecontributors/app?service=external&page=xml/TreeStructureService&node_id=1'

@@ -1,0 +1,18 @@
+name:            proc-tolweb-dot-org
+version:         0.1
+license:         BSD3
+license-file:    LICENSE
+author:          Daniel P Corson <danl@alum.mit.edu>
+synopsis:        Process the tolweb.org species tree from to a concise form.
+build-type:      Simple
+build-depends:
+    base
+  , bytestring
+  , hexpat
+  , MissingH
+
+executable:      proc-tolweb.org
+main-is:         Main.hs
+hs-source-dirs:  src
+-- O2 changes nothing:
+ghc-options:     -Wall
