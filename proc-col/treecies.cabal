@@ -9,13 +9,12 @@ build-depends:
       base
     , bytestring
     , ghc-prim
-    , cereal-derive
     , cereal
+    , cereal-derive
     , cmdlib
     , containers
     , directory
     , either-unwrap
-    , FUtil
     , HTTP
     , MissingH
     , split

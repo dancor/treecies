@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 cabal build
-time ./proc-tolweb.org data/U2013-07-09-tolweb.org-tree.xml > data/tree.txt 2> data/run-output
+time ./proc-tolweb.org data/2013-08-26.xml > data/tree.txt 2> data/run-output

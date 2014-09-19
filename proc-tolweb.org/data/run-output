@@ -6,3 +6,5 @@ Newline in DESCRIPTION text: "(Black-chinned Antbird and \nBand-tailed Antbird)"
 Newline in DESCRIPTION text: "(Black-crowned Antpitta and \nRufous-crowned Antpitta)"
 Newline in DESCRIPTION text: "(Ross's Turaco\nand Violet Turaco)"
 Just a dot for DESCRIPTION text: Triassomachilis uralensis
+7.92user 0.50system 0:08.46elapsed 99%CPU (0avgtext+0avgdata 1991180maxresident)k
+0inputs+11568outputs (0major+497875minor)pagefaults 0swaps

@@ -9,7 +9,6 @@ import Data.List.Utils
 import Data.Maybe
 import Data.Tree
 import Network.HTTP
-import Prelude hiding (catch)
 import System.IO
 import qualified Text.XML.Light as X
 
@@ -26,13 +25,10 @@ openUrl :: String -> IO String
 openUrl x = getResponseBody =<< simpleHTTP (getRequest x)
 
 idToInfo :: Int -> IO SearchInfo
-idToInfo cladeId = searchToInfo Nothing $ "id=" ++ show cladeId
+idToInfo cladeId = searchToInfo $ "id=" ++ show cladeId
 
 urlize :: String -> String
 urlize = replace " " "%s"
-
-topNameToInfo :: String -> IO SearchInfo
-topNameToInfo name = searchToInfo (Just Kingdom) $ "name=" ++ urlize name
 
 pullCdData :: X.Element -> String
 pullCdData = X.cdData . head . X.onlyText . X.elContent
@@ -46,41 +42,41 @@ xmlGetTolNode a = TolNode
     (BSC.pack $ pullCdDataOf "name" a)
     (read $     pullCdDataOf "rank" a)
 
-searchToInfo :: Maybe Rank -> String -> IO SearchInfo
-searchToInfo rankMb search = catch (searchToInfoTry rankMb search) $ \e -> do
+searchToInfo :: String -> IO SearchInfo
+searchToInfo search = catch (searchToInfoTry search) $ \e -> do
     hPutStrLn stderr $ show (e :: IOException)
-    searchToInfoTryAgain rankMb search
+    searchToInfoTryAgain search
 
-searchToInfoTryAgain :: Maybe Rank -> String -> IO SearchInfo
-searchToInfoTryAgain rankMb search = do
+searchToInfoTryAgain :: String -> IO SearchInfo
+searchToInfoTryAgain search = do
     hPutStrLn stderr "Waiting 1 sec.."
     threadDelay (1 * 1000 * 1000)
-    searchToInfo rankMb search
+    searchToInfo search
 
-searchToInfoTry :: Maybe Rank -> String -> IO SearchInfo
-searchToInfoTry rankMb search = do
+el1Mb :: [a] -> Maybe a
+el1Mb = listToMaybe . drop 1
+
+searchToInfoTry :: String -> IO SearchInfo
+searchToInfoTry search = do
     xmlStr <- openUrl $
         "http://www.catalogueoflife.org/col/webservice?response=full&" ++
         search
-    let tryGetEl1 x = case x of
-          _:y:_ -> Just y
-          _ -> 
-            Nothing
-            -- error $ "tryGetEl1: " ++ show (rankMb, search, x, xml)
+    let
         results =
-            fmap (X.onlyElems . X.elContent) . tryGetEl1 . X.onlyElems $
+            fmap (X.onlyElems . X.elContent) . el1Mb . X.onlyElems $
             X.parseXML xmlStr
-        resultToInfo :: X.Element -> SearchInfo
-        resultToInfo r =
-            SearchInfo (xmlGetTolNode r) kids
+        resultToInfo :: [X.Element] -> SearchInfo
+        resultToInfo rs@(r:_) =
+            if search == "id=0"
+              then SearchInfo initialTolNode resultTolNodes
+              else SearchInfo (xmlGetTolNode r) kids1
           where
-            kids = map xmlGetTolNode . X.findChildren (X.unqual "taxon") .
+            resultTolNodes = map xmlGetTolNode rs
+            kids1 = map xmlGetTolNode . X.findChildren (X.unqual "taxon") .
                 fromJust $ X.findChild (X.unqual "child_taxa") r
-        resultFilter =
-            maybe id (\r -> filter ((r ==) . tnRank . siTolNode)) rankMb
     case results of
-      Nothing -> searchToInfoTryAgain rankMb search
-      Just x -> return . head . resultFilter $ map resultToInfo x
+      Nothing -> searchToInfoTryAgain search
+      Just x -> return $ resultToInfo x
 
 searchInfoToTol :: SearchInfo -> Tol
 searchInfoToTol (SearchInfo tolNode kids) =
@@ -100,8 +96,3 @@ tnGrabKids tn =
                    else error "Species name didn't have parent as prefix."
           else n
     speciesTrim (Node _ _) = error "Grabbed just kids but now a grandparent."
-
-{-
-initialFol :: IO Fol
-initialFol = map searchInfoToTol <$> mapM (topNameToInfo . BSC.unpack) kingdoms
--}
