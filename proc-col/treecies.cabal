@@ -8,15 +8,11 @@ build-type:      Simple
 build-depends:
       base
     , bytestring
-    , ghc-prim
-    , cereal
     , cmdlib
     , containers
     , directory
-    , either-unwrap
     , HTTP
     , MissingH
-    , split
     , xml
 
 executable:      web_tol
