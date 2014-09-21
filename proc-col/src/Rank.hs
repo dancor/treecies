@@ -1,12 +1,8 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Rank where
 
-import qualified Data.ByteString.Char8 as BSC
-import qualified Data.Serialize as Ser
-import Data.Serialize.Derive
-import GHC.Generics
+import qualified Data.ByteString as BS
 
 -- The Catalogue of Life includes "superfamily" for certain groups,
 -- such as large beetle orders.
@@ -20,9 +16,9 @@ data Rank
     | Family
     | Genus
     | Species
-    deriving (Enum, Eq, Generic, Ord, Show, Read)
+    deriving (Enum, Eq, Ord, Show, Read)
 
-rankPlural :: Rank -> BSC.ByteString
+rankPlural :: Rank -> BS.ByteString
 rankPlural RankAll     = error "rankPlural: RankAll"
 rankPlural Kingdom     = "Kingdoms"
 rankPlural Phylum      = "Phyla"
@@ -55,10 +51,6 @@ abbrToRank 'F' = Family
 abbrToRank 'G' = Genus
 abbrToRank 'S' = Species
 abbrToRank c = error $ "abbrToRank: " ++ [c]
-
-instance Ser.Serialize Rank where
-    get = deriveGet
-    put = derivePut
 
 mainRanks :: [Rank]
 mainRanks =

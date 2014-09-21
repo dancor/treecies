@@ -10,7 +10,6 @@ build-depends:
     , bytestring
     , ghc-prim
     , cereal
-    , cereal-derive
     , cmdlib
     , containers
     , directory
@@ -21,6 +20,6 @@ build-depends:
     , xml
 
 executable:      web_tol
-main-is:         WebTol.hs
+main-is:         Main.hs
 hs-source-dirs:  src
-ghc-options:     -Wall -O2
+ghc-options:     -Wall -O3
