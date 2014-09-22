@@ -7,37 +7,77 @@ import Control.Applicative
 import Control.Arrow
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
-import qualified Data.IntMap as IM
+import Data.Char
+import qualified Data.IntMap.Strict as IM
+import Data.Function
+import Data.List
+import qualified Data.Map.Strict as M
+import Data.Maybe
 import Data.Monoid
 
 import Rank
 import Tol
 import Web
 
-{-
-treeKidCount :: Tree a -> Tree (a, Int)
-treeKidCount (Node n kids) = Node (n, length kids) (forestKidCount kids)
+type Counts = M.Map Rank Int
 
-forestKidCount :: Forest a -> Forest (a, Int)
-forestKidCount = map treeKidCount
+data TolCountsNode = TolCountsNode
+    { cRank :: !Rank
+    , cName :: !BS.ByteString
+    , cCounts :: !Counts
+    , cKids :: !TolCounts
+    }
 
-folCalcCounts :: Fol -> Forest (TolNode, M.Map Rank Int)
-folCalcCounts = map tolCalcCounts
+type TolCounts = IM.IntMap TolCountsNode
 
-tolCalcCounts :: Tol -> Tree (TolNode, M.Map Rank Int)
-tolCalcCounts (Node tn kids) =
-    Node (tn, counts) kids'
+tolCalcCounts :: Tol -> TolCounts
+tolCalcCounts = IM.map tolNodeCalcCounts
+
+tolNodeCalcCounts :: TolNode -> TolCountsNode
+tolNodeCalcCounts (TolNode rank name kids) =
+    TolCountsNode rank name counts kidCounts
   where
-    kids' = folCalcCounts kids
-    kidsCounts = map (snd . rootLabel) kids'
-    counts =
-        M.unionsWith (+)
-        ((M.singleton (tnRank tn) 1) : kidsCounts)
+    kidCounts = tolCalcCounts kids
+    counts = M.unionsWith (+) $
+        M.singleton rank 1 : map cCounts (IM.elems kidCounts)
+
+tolSummary :: Tol -> [BS.ByteString]
+tolSummary tol = concat
+    [ [ BS.intercalate "\t" $ map ("      " <>)
+        ["", "", "P", "C", "O", "F", "G", "S"]
+      , showNodeCounts lev0Counts
+      , ""
+      ]
+    , map (("- " `BS.append`) . showNodeCounts) lev1Counts
+    , [""]
+    , filter (not . BS.null)
+      [ BSC.unlines $ catMaybes
+        [ if name /= "Viruses" || rank >= Family
+          then Just $ rankWithMost name rank innerRank kids
+          else Nothing
+        | innerRank <- mainRanks
+        , innerRank > rank
+        ]
+      | TolCountsNode _ name _ kids <- lev1Counts
+      , rank <- init $ tail mainRanks
+      ]
+    ]
+  where
+    lev0Counts = tolNodeCalcCounts $ TolNode RankAll "All Life" tol
+    lev1Counts = sortBy (flip compare `on` M.lookup Genus . cCounts) .
+        IM.elems $ cKids lev0Counts
+
+showNodeCounts :: TolCountsNode -> BS.ByteString
+showNodeCounts (TolCountsNode _ name counts _) =
+    BS.concat [name, ":\t", showCounts counts]
+
+lPadTo :: Char -> Int -> BS.ByteString -> BS.ByteString
+lPadTo c n s = BSC.replicate (n - BS.length s) c <> s
 
 showCounts :: M.Map Rank Int -> BS.ByteString
 showCounts =
     BS.intercalate (BSC.pack "\t") .
-    map (\(rank, i) -> BSC.pack $ rankAbbr rank : ':' : show i) .
+    map (lPadTo ' ' 7 . BSC.pack . show . snd) .
     killSomeRanks .
     killFirstIfOne .
     M.toList
@@ -46,65 +86,33 @@ showCounts =
     killFirstIfOne a = a
     killSomeRanks = filter ((`notElem` [Kingdom, Superfamily]) . fst)
 
-showTolCounts :: Tree (TolNode, M.Map Rank Int) -> BS.ByteString
-showTolCounts (Node (tn, c) _) =
-    BS.concat [tnName tn, ":\t", showCounts c]
-
-showFolCounts :: Forest (TolNode, M.Map Rank Int) -> [BS.ByteString]
-showFolCounts = map (("- " `BS.append`) . showTolCounts)
-
-travelDown
-    :: BS.ByteString
-    -> Forest (TolNode, M.Map Rank Int)
-    -> Forest (TolNode, M.Map Rank Int)
-travelDown s = subForest . head . filter ((== s) . tnName . fst . rootLabel)
-
-rankWithMost
-     :: Rank
-     -> Rank
-     -> [Tree (TolNode, M.Map Rank Int)]
-     -> TolNode
-     -> BSC.ByteString
-rankWithMost rank innerRank kids tolNode =
+rankWithMost :: BS.ByteString -> Rank -> Rank -> TolCounts -> BS.ByteString
+rankWithMost name rank innerRank tolCounts =
     BSC.unlines $
         zipWith BS.append
             (label : repeat labelSp)
             results
   where
     label = BS.concat
-        [ tnName tolNode, "   \t", rankPlural rank, " with most\t"
+        [ name, "   \t", rankPlural rank, " with most\t"
         , rankPlural innerRank, ":  \t"
         ]
     labelSp = BSC.map (\ c -> if isSpace c then c else ' ') label
     results = take 5 .
-          map (\ (tn, c) ->
-              BS.concat [tnName tn, BSC.pack (' ' : show c)]) .
-          sortBy (flip $ comparing snd) .
+          map (\(name2, c) ->
+              BS.concat [name2, BSC.pack (' ' : show c)]) .
+          sortBy (flip compare `on` snd) .
           map (second $ M.findWithDefault 0 innerRank) .
-          -- filter ((/= "Not assigned") . tnName . fst) $
-          filter ((== rank) . tnRank . fst) $
-          concatMap flatten kids
+          map (first snd) .
+          filter ((== rank) . fst . fst) $
+          tolCountsFlatten tolCounts
 
-folSummary :: Fol -> [BS.ByteString]
-folSummary fol = concat
-    [ [showTolCounts topCounts]
-    , showFolCounts folCounts
-    , [""]
-    , filter (not . BS.null) [ BSC.unlines $ catMaybes
-        [ if tnName tn /= "Viruses" || rank >= Family
-          then Just $ rankWithMost rank innerRank kids tn
-          else Nothing
-        | innerRank <- mainRanks
-        , innerRank > rank
-        ]
-      | Node (tn, _) kids <- folCounts
-      , rank <- init $ tail mainRanks
-      ]
-    ]
-  where
-    topCounts = tolCalcCounts $ Node (TolNode 0 "All Life" RankAll) fol
-    folCounts = subForest topCounts
--}
+tolCountsFlatten :: TolCounts -> [((Rank, BS.ByteString), Counts)]
+tolCountsFlatten =
+    concatMap (\c ->
+        ((cRank c, cName c), cCounts c) : tolCountsFlatten (cKids c)
+        ) .
+    IM.elems
 
 {-
 folFindDupes :: Fol -> (Fol, [[TolNode]])

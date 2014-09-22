@@ -119,9 +119,7 @@ main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \opts -> do
             error "todo"
             -- showFolSp . filterFol opts $ folCalcCounts fol
           else showTol tol
-    when (treeSummary opts) . BS.putStr . BSC.unlines $
-        error "todo"
-        -- tolSummary tol
+    when (treeSummary opts) . BS.putStr . BSC.unlines $ tolSummary tol
     when (growTree opts) $ growWhileCan opts tolF tol
 
 readOrErr :: Read a => String -> String -> a
