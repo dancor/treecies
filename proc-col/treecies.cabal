@@ -11,8 +11,7 @@ build-depends:
     , cmdlib
     , containers
     , directory
-    , HTTP
-    , MissingH
+    , http-conduit
     , xml
 
 executable:      web_tol

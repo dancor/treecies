@@ -7,6 +7,8 @@ import Control.Applicative
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Lazy as BSL
+import Data.Function
+import Data.List
 import Data.Monoid
 import qualified Data.IntMap.Strict as IM
 
@@ -27,7 +29,8 @@ showTol !tol = prefixShowTol "" tol
 
 prefixShowTol :: BS.ByteString -> Tol -> [BS.ByteString]
 prefixShowTol !prefix !tol =
-    concatMap (uncurry (prefixShowIdTolNode prefix)) $ IM.toList tol
+    concatMap (uncurry (prefixShowIdTolNode prefix)) .
+    sortBy (compare `on` tName . snd) $ IM.toList tol
 
 prefixShowIdTolNode :: BS.ByteString -> NodeId -> TolNode -> [BS.ByteString]
 prefixShowIdTolNode !prefix !nodeId !(TolNode rank name kids) =
