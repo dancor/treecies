@@ -52,7 +52,7 @@ tolSummary tol = concat
     , [""]
     , filter (not . BS.null)
       [ BSC.unlines $ catMaybes
-        [ if name /= "Viruses" || rank >= Family
+        [ if name /= "Viruses" || rank >= Order
           then Just $ rankWithMost name rank innerRank kids
           else Nothing
         | innerRank <- mainRanks
