@@ -21,25 +21,16 @@ import Web
 
 type Counts = M.Map Rank Int
 
-data TolCountsNode = TolCountsNode
-    { cRank :: !Rank
-    , cName :: !BS.ByteString
-    , cCounts :: !Counts
-    , cKids :: !TolCounts
-    }
-
-type TolCounts = IM.IntMap TolCountsNode
-
-tolCalcCounts :: Tol -> TolCounts
+tolCalcCounts :: ITree Taxon -> ITree (Taxon, Counts)
 tolCalcCounts = IM.map tolNodeCalcCounts
 
-tolNodeCalcCounts :: TolNode -> TolCountsNode
-tolNodeCalcCounts (TolNode rank name kids) =
-    TolCountsNode rank name counts kidCounts
+tolNodeCalcCounts :: INode Taxon -> INode (Taxon, Counts)
+tolNodeCalcCounts (INode t@(Taxon rank _) kids) =
+    INode (t, counts) kidCounts
   where
     kidCounts = tolCalcCounts kids
     counts = M.unionsWith (+) $
-        M.singleton rank 1 : map cCounts (IM.elems kidCounts)
+        M.singleton rank 1 : map (snd . iVal) (IM.elems kidCounts)
 
 tolSummary :: Tol -> [BS.ByteString]
 tolSummary tol = concat
@@ -58,17 +49,17 @@ tolSummary tol = concat
         | innerRank <- mainRanks
         , innerRank > rank
         ]
-      | TolCountsNode _ name _ kids <- lev1Counts
+      | INode (Taxon _ name, _) kids <- lev1Counts
       , rank <- init $ tail mainRanks
       ]
     ]
   where
-    lev0Counts = tolNodeCalcCounts $ TolNode RankAll "All Life" tol
-    lev1Counts = sortBy (flip compare `on` M.lookup Genus . cCounts) .
-        IM.elems $ cKids lev0Counts
+    lev0Counts = tolNodeCalcCounts $ INode (Taxon RankAll "All Life") tol
+    lev1Counts = sortBy (flip compare `on` M.lookup Genus . snd . iVal) .
+        IM.elems $ iKids lev0Counts
 
-showNodeCounts :: TolCountsNode -> BS.ByteString
-showNodeCounts (TolCountsNode _ name counts _) =
+showNodeCounts :: INode (Taxon, Counts) -> BS.ByteString
+showNodeCounts (INode (Taxon _ name, counts) _) =
     BS.concat [name, ":\t", showCounts counts]
 
 lPadTo :: Char -> Int -> BS.ByteString -> BS.ByteString
@@ -86,7 +77,12 @@ showCounts =
     killFirstIfOne a = a
     killSomeRanks = filter ((`notElem` [Kingdom, Superfamily]) . fst)
 
-rankWithMost :: BS.ByteString -> Rank -> Rank -> TolCounts -> BS.ByteString
+rankWithMost
+    :: BS.ByteString
+    -> Rank
+    -> Rank
+    -> ITree (Taxon, Counts)
+    -> BS.ByteString
 rankWithMost name rank innerRank tolCounts =
     BSC.unlines $
         zipWith BS.append
@@ -103,16 +99,9 @@ rankWithMost name rank innerRank tolCounts =
               BS.concat [name2, BSC.pack (' ' : show c)]) .
           sortBy (flip compare `on` snd) .
           map (second $ M.findWithDefault 0 innerRank) .
-          map (first snd) .
-          filter ((== rank) . fst . fst) $
-          tolCountsFlatten tolCounts
-
-tolCountsFlatten :: TolCounts -> [((Rank, BS.ByteString), Counts)]
-tolCountsFlatten =
-    concatMap (\c ->
-        ((cRank c, cName c), cCounts c) : tolCountsFlatten (cKids c)
-        ) .
-    IM.elems
+          map (first tName) .
+          filter ((== rank) . tRank . fst) $
+          flattenITree tolCounts
 
 {-
 folFindDupes :: Fol -> (Fol, [[TolNode]])
@@ -157,10 +146,14 @@ growTol :: Rank -> Int -> Tol -> IO (Int, Tol)
 growTol !maxRank !growsLeft !tol =
     intMapAccumWithKeyM (growTolAccum maxRank) growsLeft tol
 
-growTolAccum :: Rank -> Int -> NodeId -> TolNode -> IO (Int, TolNode)
-growTolAccum !maxRank !growsLeft !nodeId !tolNode@(TolNode rank name kids) = do
+onIVal :: (a -> a) -> INode a -> INode a
+onIVal f (INode a kids) = INode (f a) kids
+
+growTolAccum :: Rank -> Int -> Int -> INode Taxon -> IO (Int, INode Taxon)
+growTolAccum !maxRank !growsLeft !nodeId
+        !iNode@(INode (Taxon rank name) kids) = do
     if growsLeft <= 0 || rank >= maxRank
-      then return (growsLeft, tolNode)
+      then return (growsLeft, iNode)
       else if IM.null kids
         then do
           BSC.putStrLn $ BSC.pack (show rank) <> " " <> name <> " " <>
@@ -168,13 +161,14 @@ growTolAccum !maxRank !growsLeft !nodeId !tolNode@(TolNode rank name kids) = do
           kids2 <- idGetTol nodeId
           let kids3 = if rank == Genus
                 then IM.map
-                  (\tN -> tN {tName = speciesKillGenus name (tName tN)})
+                  (onIVal $ \tN ->
+                      tN {tName = speciesKillGenus name (tName tN)})
                   kids2
                 else kids2
-          return (growsLeft - 1, TolNode rank name kids3)
+          return (growsLeft - 1, INode (Taxon rank name) kids3)
         else do
           (growsLeft', kids') <- growTol maxRank growsLeft kids
-          return (growsLeft', TolNode rank name kids')
+          return (growsLeft', INode (Taxon rank name) kids')
 
 speciesKillGenus :: BS.ByteString -> BS.ByteString -> BS.ByteString
 -- Some species have no names, weirdly.

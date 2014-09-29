@@ -14,29 +14,51 @@ import qualified Data.IntMap.Strict as IM
 
 import Rank
 
-type NodeId = Int
+data INode a = INode
+    { iVal :: !a
+    , iKids :: !(ITree a)
+    }
 
-data TolNode = TolNode
+type ITree a = IM.IntMap (INode a)
+
+data Taxon = Taxon
     { tRank :: !Rank
     , tName :: !BS.ByteString
-    , tKids :: !Tol
     } deriving Show
 
-type Tol = IM.IntMap TolNode
+type Tol = ITree Taxon
+
+flattenITree :: ITree a -> [a]
+flattenITree = concatMap (\(INode a kids) -> a : flattenITree kids) . IM.elems
 
 showTol :: Tol -> [BS.ByteString]
-showTol !tol = prefixShowTol "" tol
+showTol = showITree showIdTaxon (compare `on` tName)
 
-prefixShowTol :: BS.ByteString -> Tol -> [BS.ByteString]
-prefixShowTol !prefix !tol =
-    concatMap (uncurry (prefixShowIdTolNode prefix)) .
-    sortBy (compare `on` tName . snd) $ IM.toList tol
+showIdTaxon :: Int -> Taxon -> BS.ByteString
+showIdTaxon !taxonId !(Taxon rank name) = BSC.pack [rankAbbr rank] <> ":" <>
+    name <> " " <> BSC.pack (show taxonId)
 
-prefixShowIdTolNode :: BS.ByteString -> NodeId -> TolNode -> [BS.ByteString]
-prefixShowIdTolNode !prefix !nodeId !(TolNode rank name kids) =
-    prefix <> BSC.pack [rankAbbr rank] <> ":" <> name <> " " <>
-        BSC.pack (show nodeId) <> "\n" :
-    prefixShowTol (prefix <> " ") kids
+showITree
+    :: (Int -> a -> BS.ByteString)
+    -> (a -> a -> Ordering)
+    -> ITree a
+    -> [BS.ByteString]
+showITree = prefixShowITree ""
+
+-- todo: This isn't Taxon agnostic..
+prefixShowITree
+    :: BS.ByteString
+    -> (Int -> a -> BS.ByteString)
+    -> (a -> a -> Ordering)
+    -> ITree a
+    -> [BS.ByteString]
+prefixShowITree !prefix f cmp !tol =
+    concatMap (\(i, INode a kids) ->
+        prefix <> f i a : prefixShowITree (prefix <> " ") f cmp kids) .
+    sortBy (cmp `on` iVal . snd) $ IM.toList tol
+
+mapITree :: (a -> b) -> ITree a -> ITree b
+mapITree f = IM.map (\(INode a kids) -> INode (f a) $ mapITree f kids)
 
 readTol :: [BS.ByteString] -> Tol
 readTol = readTolAccum IM.empty
@@ -45,13 +67,13 @@ readTolAccum :: Tol -> [BS.ByteString] -> Tol
 readTolAccum !tol [] = tol
 readTolAccum !tol (l:ls) = readTolAccum tol' ls2
   where
-    (nodeId, tolNode) = readIdTolNode l
+    (taxonId, taxon) = readIdTaxon l
     (ls1, ls2) = span (" " `BS.isPrefixOf`) ls
-    tol' = IM.insert nodeId (tolNode . readTol $ map BS.tail ls1) tol
+    tol' = IM.insert taxonId (INode taxon . readTol $ map BS.tail ls1) tol
 
-readIdTolNode :: BS.ByteString -> (NodeId, Tol -> TolNode)
-readIdTolNode s =
-    (read $ BSC.unpack rest2, TolNode (abbrToRank rank) (BS.init rest1Sp))
+readIdTaxon :: BS.ByteString -> (Int, Taxon)
+readIdTaxon s =
+    (read $ BSC.unpack rest2, Taxon (abbrToRank rank) (BS.init rest1Sp))
   where
     Just (rank, s1) = BSC.uncons s
     Just (':', rest) = BSC.uncons s1
@@ -66,4 +88,4 @@ readTolF tolF = do
     return tol
 
 writeTolF :: FilePath -> Tol -> IO ()
-writeTolF tolF = BSL.writeFile tolF . BSL.fromChunks . showTol
+writeTolF tolF = BSL.writeFile tolF . BSL.fromChunks . map (<> "\n") . showTol

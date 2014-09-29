@@ -1,17 +1,22 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Lazy as BSL
 import Data.Data
-import Data.List
+import Data.Function
 import qualified Data.IntMap as IM
+import Data.List
+import qualified Data.Map as M
 import Data.Maybe
+import Data.Monoid
 import qualified System.Console.CmdLib as Cmd
 import System.Directory
 
+import Rank
 import Tol
 import TolWork
 import Web
@@ -116,8 +121,15 @@ main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \opts -> do
     when (printTree opts) . BSL.putStr . BSL.fromChunks $
         if speciesCount opts
           then
-            error "todo"
             -- showFolSp . filterFol opts $ folCalcCounts fol
+            map (<> "\n") .
+            showITree
+                (\i (taxon, spCnt) ->
+                    showIdTaxon i taxon <> " " <> BSC.pack (show spCnt))
+                (flip compare `on` snd) .
+            mapITree (\(t, counts) ->
+                (t, M.findWithDefault 0 Species counts)) $
+            tolCalcCounts tol
           else showTol tol
     when (treeSummary opts) . BS.putStr . BSC.unlines $ tolSummary tol
     when (growTree opts) $ growWhileCan opts tolF tol
