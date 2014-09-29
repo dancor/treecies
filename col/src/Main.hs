@@ -127,6 +127,8 @@ main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \opts -> do
                 (\i (taxon, spCnt) ->
                     showIdTaxon i taxon <> " " <> BSC.pack (show spCnt))
                 (flip compare `on` snd) .
+            (if speciesMin opts == 0 then id
+                else filterITree ((> speciesMin opts) . snd)) .
             mapITree (\(t, counts) ->
                 (t, M.findWithDefault 0 Species counts)) $
             tolCalcCounts tol

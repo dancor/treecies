@@ -28,6 +28,11 @@ data Taxon = Taxon
 
 type Tol = ITree Taxon
 
+filterITree :: (a -> Bool) -> ITree a -> ITree a
+filterITree f =
+    IM.map (\(INode a kids) -> INode a $ filterITree f kids) .
+    IM.filter (f . iVal)
+
 flattenITree :: ITree a -> [a]
 flattenITree = concatMap (\(INode a kids) -> a : flattenITree kids) . IM.elems
 
