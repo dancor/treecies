@@ -22,14 +22,15 @@ import TolWork
 import Web
 
 data Opts = Opts
-    { printTree    :: Bool
-    , speciesCount :: Bool
-    , speciesMin   :: Int
-    , treeSummary  :: Bool
-    , growTree     :: Bool
-    , growRank     :: String
-    , growStep     :: Int
-    , optExtra     :: [String]
+    { printTree     :: Bool
+    , speciesCounts :: Bool
+    , speciesMin    :: Int
+    , treeSummary   :: Bool
+    , hideTaxonIds  :: Bool
+    , growTree      :: Bool
+    , growRank      :: String
+    , growStep      :: Int
+    , optExtra      :: [String]
     } deriving (Data, Eq, Show, Typeable)
 
 emptyOpts :: Opts
@@ -42,13 +43,14 @@ emptyOpts = Opts
     (error "main unitialized field 6")
     (error "main unitialized field 7")
     (error "main unitialized field 8")
+    (error "main unitialized field 9")
 
 instance Cmd.Attributes Opts where
     attributes _ = Cmd.group "Options"
         [ printTree Cmd.%>
             [ Cmd.Help "Output the tree."
             ]
-        , speciesCount Cmd.%>
+        , speciesCounts Cmd.%>
             [ Cmd.Help "Show species counts."
             ]
         , speciesMin Cmd.%>
@@ -57,6 +59,9 @@ instance Cmd.Attributes Opts where
             ]
         , treeSummary Cmd.%>
             [ Cmd.Help "Summarize the contents of the tree."
+            ]
+        , hideTaxonIds Cmd.%>
+            [ Cmd.Help "Don't show the internal taxon ids."
             ]
         , growTree Cmd.%>
             [ Cmd.Help $ "Grow the tree to the grow level."
@@ -88,27 +93,20 @@ instance Cmd.RecordCommand Opts where
     run' _ _ = return ()
 
 {-
-filterTol :: Opts -> Tree (t, Map.Map Rank Int) -> Tree (t, Map.Map Rank Int)
-filterTol opts (Node a kids) = Node a $ filterFol opts kids
-
-filterFol :: Opts -> Forest (t, Map.Map Rank Int) -> Forest (t, Map.Map Rank Int)
-filterFol opts = map (filterTol opts) . filter filtF
+optsDeps :: Opts -> Opts
+optsDeps (Opts printTree speciesCounts speciesMin treeSummary hideTaxonIds
+        growTree growRank growStep optExtra) =
+    Opts printTree2 speciesCounts2 speciesMin treeSummary hideTaxonIds
+        growTree2 growRank growStep optExtra
   where
-    filtF (Node (_, counts) _) =
-        speciesMin opts <= Map.findWithDefault 0 Species counts
-
-showFolSp :: Forest (TolNode, Map.Map Rank Int) -> [BS.ByteString]
-showFolSp = drawForestTiny . map (fmap showTolNodeSp)
-
-showTolNodeSp :: (TolNode, Map.Map Rank Int) -> BS.ByteString
-showTolNodeSp (TolNode _ name rank, counts) =
-    BSC.cons (rankAbbr rank) (BSC.cons ':' name)
-    `BS.append`
-    (' ' `BSC.cons` BSC.pack (show $ Map.findWithDefault 0 Species counts))
+    speciesCounts2 = if speciesMin then True else speciesCounts
+    printTree2 = if speciesCounts2 || hideTaxonIds then True else printTree
+    growTree2 = if growRank || growStep then True else growRank
 -}
 
 main :: IO ()
-main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \opts -> do
+main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \optsPre -> do
+    let opts = {-optsDeps-} optsPre
     tolF <- case optExtra opts of
       [x] -> return x
       -- I guess Cmd doesn't expose its full help message to us? This is
@@ -119,20 +117,21 @@ main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \opts -> do
       then readTolF tolF
       else return IM.empty
     when (printTree opts) . BSL.putStr . BSL.fromChunks $
-        if speciesCount opts
+        if speciesCounts opts
           then
             -- showFolSp . filterFol opts $ folCalcCounts fol
             map (<> "\n") .
             showITree
                 (\i (taxon, spCnt) ->
-                    showIdTaxon i taxon <> " " <> BSC.pack (show spCnt))
+                    showIdTaxon (not $ hideTaxonIds opts) i taxon <> " " <>
+                    BSC.pack (show spCnt))
                 (flip compare `on` snd) .
             (if speciesMin opts == 0 then id
                 else filterITree ((> speciesMin opts) . snd)) .
             mapITree (\(t, counts) ->
                 (t, M.findWithDefault 0 Species counts)) $
             tolCalcCounts tol
-          else showTol tol
+          else showTol (not $ hideTaxonIds opts) tol
     when (treeSummary opts) . BS.putStr . BSC.unlines $ tolSummary tol
     when (growTree opts) $ growWhileCan opts tolF tol
 
@@ -153,6 +152,6 @@ growWhileCan opts tolF tol = do
     putStrLn "*"
     putStrLn "*"
     putStrLn "*"
-    writeTolF tolF tol3
+    writeTolF (not $ hideTaxonIds opts) tolF tol3
     putStrLn $ "Saved.  growLeft = " ++ show growsLeft
     when (growsLeft < numToGrow) $ growWhileCan opts tolF tol3

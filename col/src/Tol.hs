@@ -36,12 +36,13 @@ filterITree f =
 flattenITree :: ITree a -> [a]
 flattenITree = concatMap (\(INode a kids) -> a : flattenITree kids) . IM.elems
 
-showTol :: Tol -> [BS.ByteString]
-showTol = showITree showIdTaxon (compare `on` tName)
+showTol :: Bool -> Tol -> [BS.ByteString]
+showTol showId = showITree (showIdTaxon showId) (compare `on` tName)
 
-showIdTaxon :: Int -> Taxon -> BS.ByteString
-showIdTaxon !taxonId !(Taxon rank name) = BSC.pack [rankAbbr rank] <> ":" <>
-    name <> " " <> BSC.pack (show taxonId)
+showIdTaxon :: Bool -> Int -> Taxon -> BS.ByteString
+showIdTaxon showId !taxonId !(Taxon rank name) =
+    BSC.pack [rankAbbr rank] <> ":" <> name <>
+    (if showId then " " <> BSC.pack (show taxonId) else "")
 
 showITree
     :: (Int -> a -> BS.ByteString)
@@ -92,5 +93,6 @@ readTolF tolF = do
     --return fol'
     return tol
 
-writeTolF :: FilePath -> Tol -> IO ()
-writeTolF tolF = BSL.writeFile tolF . BSL.fromChunks . map (<> "\n") . showTol
+writeTolF :: Bool -> FilePath -> Tol -> IO ()
+writeTolF showId tolF =
+    BSL.writeFile tolF . BSL.fromChunks . map (<> "\n") . showTol showId
