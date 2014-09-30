@@ -25,8 +25,9 @@ data Opts = Opts
     { printTree     :: Bool
     , speciesCounts :: Bool
     , speciesMin    :: Int
-    , treeSummary   :: Bool
     , hideTaxonIds  :: Bool
+    , collapseSuperfamilies :: Bool
+    , treeSummary   :: Bool
     , growTree      :: Bool
     , growRank      :: String
     , growStep      :: Int
@@ -44,6 +45,7 @@ emptyOpts = Opts
     (error "main unitialized field 7")
     (error "main unitialized field 8")
     (error "main unitialized field 9")
+    (error "main unitialized field 10")
 
 instance Cmd.Attributes Opts where
     attributes _ = Cmd.group "Options"
@@ -57,11 +59,14 @@ instance Cmd.Attributes Opts where
             [ Cmd.Help "Only print nodes with at least this many species."
             , Cmd.Default (0 :: Int)
             ]
-        , treeSummary Cmd.%>
-            [ Cmd.Help "Summarize the contents of the tree."
-            ]
         , hideTaxonIds Cmd.%>
             [ Cmd.Help "Don't show the internal taxon ids."
+            ]
+        , collapseSuperfamilies Cmd.%>
+            [ Cmd.Help "Collapse superfamilies."
+            ]
+        , treeSummary Cmd.%>
+            [ Cmd.Help "Summarize the contents of the tree."
             ]
         , growTree Cmd.%>
             [ Cmd.Help $ "Grow the tree to the grow level."
@@ -116,11 +121,9 @@ main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \optsPre -> do
     tol <- if tolFExists
       then readTolF tolF
       else return IM.empty
-    when (printTree opts) . BSL.putStr . BSL.fromChunks $
-        if speciesCounts opts
+    when (printTree opts) . BSL.putStr . BSL.fromChunks . map (<> "\n") $
+        (if speciesCounts opts
           then
-            -- showFolSp . filterFol opts $ folCalcCounts fol
-            map (<> "\n") .
             showITree
                 (\i (taxon, spCnt) ->
                     showIdTaxon (not $ hideTaxonIds opts) i taxon <> " " <>
@@ -129,9 +132,14 @@ main = Cmd.getArgs >>= Cmd.executeR emptyOpts >>= \optsPre -> do
             (if speciesMin opts == 0 then id
                 else filterITree ((> speciesMin opts) . snd)) .
             mapITree (\(t, counts) ->
-                (t, M.findWithDefault 0 Species counts)) $
-            tolCalcCounts tol
-          else showTol (not $ hideTaxonIds opts) tol
+                (t, M.findWithDefault 0 Species counts)) .
+            tolCalcCounts
+          else showTol (not $ hideTaxonIds opts)
+        )
+        (if collapseSuperfamilies opts
+          then doCollapseSuperfamilies tol
+          else tol
+        )
     when (treeSummary opts) . BS.putStr . BSC.unlines $ tolSummary tol
     when (growTree opts) $ growWhileCan opts tolF tol
 

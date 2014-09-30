@@ -28,6 +28,16 @@ data Taxon = Taxon
 
 type Tol = ITree Taxon
 
+doCollapseSuperfamilies :: Tol -> Tol
+doCollapseSuperfamilies = kidMitosis myF
+  where
+    myF :: Int -> INode Taxon -> Tol
+    myF _ (INode (Taxon Superfamily _) kids) = kids
+    myF i (INode a kids) = IM.singleton i (INode a $ kidMitosis myF kids)
+
+kidMitosis :: (Int -> INode a -> ITree a) -> ITree a -> ITree a
+kidMitosis f = IM.unions . map (uncurry f) . IM.toList
+
 filterITree :: (a -> Bool) -> ITree a -> ITree a
 filterITree f =
     IM.map (\(INode a kids) -> INode a $ filterITree f kids) .
