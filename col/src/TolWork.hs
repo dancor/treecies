@@ -7,22 +7,23 @@ import Control.Applicative
 import Control.Arrow
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
-import Data.Char
-import qualified Data.IntMap.Strict as IM
 import Data.Function
 import Data.List
 import qualified Data.Map.Strict as M
 import Data.Maybe
 import Data.Monoid
 
+import Disp
 import Rank
 import Tol
 import Web
 
 type Counts = M.Map Rank Int
 
-tolCalcCounts :: ITree Taxon -> ITree (Taxon, Counts)
-tolCalcCounts = IM.map tolNodeCalcCounts
+type CountTol = ITree (Taxon, Counts)
+
+tolCalcCounts :: Tol -> CountTol
+tolCalcCounts = M.map tolNodeCalcCounts
 
 tolNodeCalcCounts :: INode Taxon -> INode (Taxon, Counts)
 tolNodeCalcCounts (INode t@(Taxon rank _) kids) =
@@ -30,19 +31,18 @@ tolNodeCalcCounts (INode t@(Taxon rank _) kids) =
   where
     kidCounts = tolCalcCounts kids
     counts = M.unionsWith (+) $
-        M.singleton rank 1 : map (snd . iVal) (IM.elems kidCounts)
+        M.singleton rank 1 : map (snd . iVal) (M.elems kidCounts)
 
 tolSummary :: Tol -> [BS.ByteString]
 tolSummary tol = concat
-    [ [ BS.intercalate "\t" $ map ("      " <>)
-        ["", "", "P", "C", "O", "F", "G", "S"]
-      , showNodeCounts lev0Counts
-      , ""
-      ]
-    , map (("- " `BS.append`) . showNodeCounts) lev1Counts
+    [ renderCols (
+      ["", "P", "C", "O", "F", "G", "S"] :
+      showNodeCounts "" lev0Counts :
+      replicate 7 "" :
+      map (showNodeCounts "- ") lev1Counts)
     , [""]
-    , filter (not . BS.null)
-      [ BSC.unlines $ catMaybes
+    , renderCols $ intercalate (replicate 2 $ replicate 5 "")
+      [ intercalate [replicate 5 ""] $ catMaybes
         [ if name /= "Viruses" || rank >= Order
           then Just $ rankWithMost name rank innerRank kids
           else Nothing
@@ -56,47 +56,34 @@ tolSummary tol = concat
   where
     lev0Counts = tolNodeCalcCounts $ INode (Taxon RankAll "All Life") tol
     lev1Counts = sortBy (flip compare `on` M.lookup Genus . snd . iVal) .
-        IM.elems $ iKids lev0Counts
+        M.elems $ iKids lev0Counts
 
-showNodeCounts :: INode (Taxon, Counts) -> BS.ByteString
-showNodeCounts (INode (Taxon _ name, counts) _) =
-    BS.concat [name, ":\t", showCounts counts]
+showNodeCounts :: BS.ByteString -> INode (Taxon, Counts) -> [BS.ByteString]
+showNodeCounts pre (INode (Taxon _ name, counts) _) =
+    (pre <> name <> ":") :
+    map (BSC.pack . show . snd) (procCounts Kingdom counts)
 
-lPadTo :: Char -> Int -> BS.ByteString -> BS.ByteString
-lPadTo c n s = BSC.replicate (n - BS.length s) c <> s
-
-showCounts :: M.Map Rank Int -> BS.ByteString
-showCounts =
-    BS.intercalate (BSC.pack "\t") .
-    map (lPadTo ' ' 7 . BSC.pack . show . snd) .
-    killSomeRanks .
-    killFirstIfOne .
-    M.toList
+procCounts :: Rank -> Counts -> [(Rank, Int)]
+procCounts rank = killSomeRanks . killFirstIfOne . M.toList
   where
     killFirstIfOne ((_, 1) : rest) = rest
     killFirstIfOne a = a
-    killSomeRanks = filter ((`notElem` [Kingdom, Superfamily]) . fst)
+    killSomeRanks = filter ((\r -> r /= Superfamily && r > rank) . fst)
 
 rankWithMost
     :: BS.ByteString
     -> Rank
     -> Rank
     -> ITree (Taxon, Counts)
-    -> BS.ByteString
-rankWithMost name rank innerRank tolCounts =
-    BSC.unlines $
-        zipWith BS.append
-            (label : repeat labelSp)
-            results
+    -> [[BS.ByteString]]
+rankWithMost name rank innerRank tolCounts = zipWith (++)
+    (label : repeat labelSp)
+    (map (:[]) results)
   where
-    label = BS.concat
-        [ name, "   \t", rankPlural rank, " with most\t"
-        , rankPlural innerRank, ":  \t"
-        ]
-    labelSp = BSC.map (\ c -> if isSpace c then c else ' ') label
+    label = [name, rankPlural rank, "with most", rankPlural innerRank <> ":"]
+    labelSp = replicate 4 ""
     results = take 5 .
-          map (\(name2, c) ->
-              BS.concat [name2, BSC.pack (' ' : show c)]) .
+          map (\(name2, c) -> name2 <> BSC.pack (' ' : show c)) .
           sortBy (flip compare `on` snd) .
           map (second $ M.findWithDefault 0 innerRank) .
           map (first tName) .
@@ -131,36 +118,36 @@ mapAccumM f acc (x:xs) = do
     (acc3, ys) <- mapAccumM f acc2 xs
     return (acc3, y:ys)
 
-intMapAccumWithKeyM
-    :: (Functor m, Monad m)
-    => (acc -> Int -> x -> m (acc, y))
+mapAccumWithKeyM
+    :: (Eq k, Functor m, Monad m)
+    => (acc -> k -> x -> m (acc, y))
     -> acc
-    -> IM.IntMap x
-    -> m (acc, IM.IntMap y)
-intMapAccumWithKeyM f acc =
-    fmap (second IM.fromAscList) .
+    -> M.Map k x
+    -> m (acc, M.Map k y)
+mapAccumWithKeyM f acc =
+    fmap (second M.fromAscList) .
     mapAccumM (\acc2 (k, v) -> second ((,) k) <$> f acc2 k v) acc .
-    IM.toAscList
+    M.toAscList
 
 growTol :: Rank -> Int -> Tol -> IO (Int, Tol)
 growTol !maxRank !growsLeft !tol =
-    intMapAccumWithKeyM (growTolAccum maxRank) growsLeft tol
+    mapAccumWithKeyM (growTolAccum maxRank) growsLeft tol
 
 onIVal :: (a -> a) -> INode a -> INode a
 onIVal f (INode a kids) = INode (f a) kids
 
-growTolAccum :: Rank -> Int -> Int -> INode Taxon -> IO (Int, INode Taxon)
+growTolAccum :: Rank -> Int -> TaxonId -> INode Taxon -> IO (Int, INode Taxon)
 growTolAccum !maxRank !growsLeft !nodeId
         !iNode@(INode (Taxon rank name) kids) = do
     if growsLeft <= 0 || rank >= maxRank
       then return (growsLeft, iNode)
-      else if IM.null kids
+      else if M.null kids
         then do
           BSC.putStrLn $ BSC.pack (show rank) <> " " <> name <> " " <>
               BSC.pack (show nodeId)
           kids2 <- idGetTol nodeId
           let kids3 = if rank == Genus
-                then IM.map
+                then M.map
                   (onIVal $ \tN ->
                       tN {tName = speciesKillGenus name (tName tN)})
                   kids2
@@ -176,6 +163,7 @@ speciesKillGenus _genus "" = ""
 speciesKillGenus genus species =
     if genusSp `BS.isPrefixOf` species
       then BS.drop (BS.length genusSp) species
-      else error "Species name didn't have genus as prefix."
+      -- else error "Species name didn't have genus as prefix."
+      else species <> "-(Species-name-did-not-have-genus-as-prefix.)"
   where
     genusSp = genus <> " "

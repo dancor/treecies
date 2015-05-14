@@ -1,0 +1,25 @@
+Unmarked terminal groups comprise K:Protozoa (can be seen as 5 parts,
+or simply the default eukaryote tree on which others are mounted):
+
+- K:Archaea
+- K:Bacteria
+- Eukaryotes:
+  - K:Plantae
+  - Excavates       (1/5)
+  - Chromalveolates:
+    - Alveolates    (2/5)
+    - Stramenopiles (K:Chromista 1/3)
+    - Hacrobia      (3/5)
+    - Rhizaria:
+      - Cercozoa    (4/5)
+      - Forminifera (K:Chromista 2/3)
+      - Radiolaria  (K:Chromista 3/3)
+  - Unikonts:       (5/5)
+    - Amoebozoa
+    - Opisthokonts:
+      - K:Animalia
+      - K:Fungi
+      - Choanoflagellates
+      - Ichthyosporea
+      - Nucleariidae
+      - Filasteria

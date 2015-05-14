@@ -7,7 +7,7 @@ import Control.Applicative
 import Control.Concurrent
 import Control.Exception
 import qualified Data.ByteString.Char8 as BSC
-import qualified Data.IntMap as IM
+import qualified Data.Map.Strict as M
 import Data.Maybe
 import Network.HTTP.Conduit
 import System.IO
@@ -21,19 +21,19 @@ pullCdData el = fmap X.cdData . listToMaybe . X.onlyText $ X.elContent el
 pullCdDataOf :: String -> X.Element -> Maybe String
 pullCdDataOf a = pullCdData . fromJust . X.findChild (X.unqual a)
 
-xmlGetTaxon :: X.Element -> Maybe (Int, INode Taxon)
+xmlGetTaxon :: X.Element -> Maybe (TaxonId, INode Taxon)
 xmlGetTaxon a = do
-    taxonId <- read <$> pullCdDataOf "id" a
+    taxonId <- BSC.pack <$> pullCdDataOf "id" a
     rank <- read <$> pullCdDataOf "rank" a
     let name = BSC.pack $ fromMaybe "" (pullCdDataOf "name" a)
-    return (taxonId, INode (Taxon rank name) IM.empty)
+    return (taxonId, INode (Taxon rank name) M.empty)
 
-idGetTol :: Int -> IO Tol
+idGetTol :: TaxonId -> IO Tol
 idGetTol taxonId = catch (idGetTolTry taxonId) $ \e -> do
     hPutStrLn stderr $ show (e :: IOException)
     idGetTolTryAgain taxonId
 
-idGetTolTryAgain :: Int -> IO Tol
+idGetTolTryAgain :: TaxonId -> IO Tol
 idGetTolTryAgain taxonId = do
     hPutStrLn stderr "Waiting 1 sec.."
     threadDelay (1 * 1000 * 1000)
@@ -42,14 +42,15 @@ idGetTolTryAgain taxonId = do
 el1Mb :: [a] -> Maybe a
 el1Mb = listToMaybe . drop 1
 
-idGetXml :: Int -> IO [X.Content]
+idGetXml :: TaxonId -> IO [X.Content]
 idGetXml taxonId = do
     xmlStr <- simpleHttp $
         "http://www.catalogueoflife.org/col/webservice?response=full&" ++
-        "id=" ++ show taxonId
+        -- "http://www.catalogueoflife.org/annual-checklist/2015/webservice?response=full&" ++
+        "id=" ++ BSC.unpack taxonId
     return $ X.parseXML xmlStr
 
-idGetTolTry :: Int -> IO Tol
+idGetTolTry :: TaxonId -> IO Tol
 idGetTolTry taxonId = do
     let myHandler (_e :: HttpException) = return Nothing
     xmlMb <- catch (Just <$> idGetXml taxonId) myHandler
@@ -60,10 +61,13 @@ idGetTolTry taxonId = do
                 fmap (X.onlyElems . X.elContent) . el1Mb $ X.onlyElems xml
             resultToTol :: [X.Element] -> Maybe Tol
             resultToTol [] = Nothing
-            resultToTol rs@(r:_) =
-                fmap IM.fromList . mapM xmlGetTaxon $ if taxonId == 0
+            resultToTol _rs@(r:_) =
+                fmap M.fromList . mapM xmlGetTaxon $
+                  {-
+                  if taxonId == 0
                   then rs
                   else
+                  -}
                     X.findChildren (X.unqual "taxon") . fromJust $
                     X.findChild (X.unqual "child_taxa") r
         case results of
