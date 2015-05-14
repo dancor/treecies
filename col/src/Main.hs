@@ -171,7 +171,7 @@ mainMain tolF opts = do
         runInputT defaultSettings $ exploreTol countTol []
 
 showRankNum :: (Rank, Int) -> BS.ByteString
-showRankNum (r, n) = BSC.pack (rankAbbr r : ':' : show n)
+showRankNum (r, n) = BSC.pack (show n <> [':', rankAbbr r])
 
 maybeRead :: Read a => String -> Maybe a
 maybeRead = fmap fst . listToMaybe . reads
@@ -182,9 +182,11 @@ exploreTol tol path = do
         (kids, vals) =
             unzip . sortOn (fmap negate . M.lookup Species . snd . snd) .
             map (second iVal) $ M.toList curTol
-    lift . BS.putStr . BSC.unlines . renderCols $
-        zipWith (\n (taxon, counts) -> BSC.pack (show n) : showTaxon taxon :
-            map showRankNum (procCounts Kingdom counts)) [1 :: Int ..]
+    lift . BS.putStr . BSC.unlines . ("":) . renderCols $
+        zipWith (\n (taxon, counts) ->
+            Right (intB n) : Left (showTaxon taxon) :
+            map (Right . showRankNum) (procCounts Kingdom counts))
+        [1 :: Int ..]
         vals
     inp <- getInputLine "number, (u)p, (q)uit> "
     case inp of

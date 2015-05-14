@@ -9,6 +9,7 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import Data.Function
 import Data.List
+import Data.List.Ordered
 import qualified Data.Map.Strict as M
 import Data.Maybe
 import Data.Monoid
@@ -36,13 +37,13 @@ tolNodeCalcCounts (INode t@(Taxon rank _) kids) =
 tolSummary :: Tol -> [BS.ByteString]
 tolSummary tol = concat
     [ renderCols (
-      ["", "P", "C", "O", "F", "G", "S"] :
+      map Right ["", "P", "C", "O", "F", "G", "S"] :
       showNodeCounts "" lev0Counts :
-      replicate 7 "" :
+      replicate 7 (Left "") :
       map (showNodeCounts "- ") lev1Counts)
     , [""]
-    , renderCols $ intercalate (replicate 2 $ replicate 5 "")
-      [ intercalate [replicate 5 ""] $ catMaybes
+    , renderCols $ intercalate (replicate 2 . replicate 6 $ Left "")
+      [ intercalate [replicate 6 $ Left ""] $ catMaybes
         [ if name /= "Viruses" || rank >= Order
           then Just $ rankWithMost name rank innerRank kids
           else Nothing
@@ -55,13 +56,14 @@ tolSummary tol = concat
     ]
   where
     lev0Counts = tolNodeCalcCounts $ INode (Taxon RankAll "All Life") tol
-    lev1Counts = sortBy (flip compare `on` M.lookup Genus . snd . iVal) .
+    lev1Counts = sortOn (fmap negate . M.lookup Species . snd . iVal) .
         M.elems $ iKids lev0Counts
 
-showNodeCounts :: BS.ByteString -> INode (Taxon, Counts) -> [BS.ByteString]
+showNodeCounts :: BS.ByteString -> INode (Taxon, Counts)
+    -> [Either BS.ByteString BS.ByteString]
 showNodeCounts pre (INode (Taxon _ name, counts) _) =
-    (pre <> name <> ":") :
-    map (BSC.pack . show . snd) (procCounts Kingdom counts)
+    (Left (pre <> name <> ":")) :
+    map (Right . intB . snd) (procCounts Kingdom counts)
 
 procCounts :: Rank -> Counts -> [(Rank, Int)]
 procCounts rank = killSomeRanks . killFirstIfOne . M.toList
@@ -75,20 +77,20 @@ rankWithMost
     -> Rank
     -> Rank
     -> ITree (Taxon, Counts)
-    -> [[BS.ByteString]]
-rankWithMost name rank innerRank tolCounts = zipWith (++)
-    (label : repeat labelSp)
-    (map (:[]) results)
+    -> [[Either BS.ByteString BS.ByteString]]
+rankWithMost name rank innerRank tolCounts =
+    zipWith (++) (label : repeat labelSp) results
   where
-    label = [name, rankPlural rank, "with most", rankPlural innerRank <> ":"]
-    labelSp = replicate 4 ""
+    label = map Left
+        [name, rankPlural rank, "with most", rankPlural innerRank <> ":"]
+    labelSp = replicate 4 (Left "")
     results = take 5 .
-          map (\(name2, c) -> name2 <> BSC.pack (' ' : show c)) .
-          sortBy (flip compare `on` snd) .
-          map (second $ M.findWithDefault 0 innerRank) .
-          map (first tName) .
-          filter ((== rank) . tRank . fst) $
-          flattenITree tolCounts
+        map (\(name2, c) -> [Left name2, Right $ intB c]) .
+        sortBy (flip compare `on` snd) .
+        map (second $ M.findWithDefault 0 innerRank) .
+        map (first tName) .
+        filter ((== rank) . tRank . fst) $
+        flattenITree tolCounts
 
 {-
 folFindDupes :: Fol -> (Fol, [[TolNode]])
